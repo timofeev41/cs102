@@ -14,8 +14,15 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     >>> encrypt_caesar("")
     ''
     """
-    ciphertext = ""
-    # PUT YOUR CODE HERE
+    ciphertext = ''
+    for letter in plaintext:
+        if (65 <= ord(letter) + 3 <= 90) or (97 <= ord(letter) + 3 <= 122):
+            ciphertext += chr(ord(letter) + 3)
+        elif (ord(letter) < 65) or (90 < ord(letter) < 97) or (ord(letter) > 122):
+            ciphertext += letter
+        else:
+            ciphertext += chr(ord(letter) - 23)
+            
     return ciphertext
 
 
