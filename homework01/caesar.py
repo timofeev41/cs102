@@ -40,7 +40,13 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     ''
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
+    for letter in ciphertext:
+        if (65 <= ord(letter) - 3 <= 90) or (97 <= ord(letter) - 3 <= 122):
+            plaintext += chr(ord(letter) - 3)
+        elif (ord(letter) < 65) or (90 < ord(letter) < 97) or (ord(letter) > 122):
+            plaintext += letter
+        else:
+            plaintext += chr(ord(letter) + 23) ##- 26 + 3
     return plaintext
 
 
