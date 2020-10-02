@@ -9,10 +9,22 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     >>> encrypt_vigenere("ATTACKATDAWN", "LEMON")
     'LXFOPVEFRNHR'
     """
-    ciphertext = ""
-    # PUT YOUR CODE HERE
-    return ciphertext
+    ciphertext = ''
 
+    for number, letter in enumerate(plaintext):
+        if ord("A") <= ord(keyword[ number % len(keyword) ]) <= ord("Z"):
+            shift = ord(keyword[ number % len(keyword) ]) - 65
+        elif ord("a") <= ord(keyword[ number % len(keyword) ]) <= ord("z"):
+            shift = ord(keyword[ number % len(keyword) ]) - 97
+
+        if ord("A") <= ord(letter) <= ord("Z"):
+            ciphertext += str(chr(ord("A") + ((ord(letter) - 65 + shift) % 26)))
+        elif ord("a") <= ord(letter) <= ord("z"):
+            ciphertext += str(chr(ord("a") + ((ord(letter) - 97 + shift) % 26)))
+        else:
+            ciphertext += str(letter)
+
+    return ciphertext
 
 def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     """
@@ -25,6 +37,19 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     >>> decrypt_vigenere("LXFOPVEFRNHR", "LEMON")
     'ATTACKATDAWN'
     """
-    plaintext = ""
-    # PUT YOUR CODE HERE
+    plaintext = ''
+
+    for number, letter in enumerate(ciphertext):
+        if 'A' <= keyword[ number % len(keyword) ] <= 'Z':
+            shift = ord(keyword[ number % len(keyword) ]) - 65
+        elif ord("a") <= ord(keyword[ number % len(keyword) ]) <= ord("z"):
+            shift = ord(keyword[ number % len(keyword) ]) - 97
+
+        if 'A' <= letter <= 'Z':
+            plaintext += str(chr(ord('A') + ((26 + ord(letter) - 65 - shift) % 26)))
+        elif ord("a") <= ord(letter) <= ord("z"):
+            plaintext += str(chr(ord("a") + ((26 + ord(letter) - 97 - shift) % 26)))
+        else:
+            plaintext += str(letter)
+
     return plaintext
