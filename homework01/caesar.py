@@ -49,8 +49,9 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     plaintext = ""
 
     for letter in ciphertext:
-        if ((ord("A") <= ord(letter) - shift <= ord("Z")) 
-        or (ord("a") <= ord(letter) - shift <= ord("z"))):
+        if (ord("A") <= ord(letter) - shift <= ord("Z")) or (
+            ord("a") <= ord(letter) - shift <= ord("z")
+        ):
             plaintext += chr(ord(letter) - shift)
         elif (
             (ord(letter) < ord("A"))
@@ -64,24 +65,27 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
 
 
 def selection(ciphertext: str, word: str) -> int:
-    new_word = ''
+    new_word = ""
     if ciphertext == word:
         return 0
     for shift in range(1, 26):
         for letter in word:
-            if ((ord("A") <= ord(letter) + shift <= ord("Z")) 
-            or (ord("a") <= ord(letter) + shift <= ord("z"))):
+            if (ord("A") <= ord(letter) + shift <= ord("Z")) or (
+                ord("a") <= ord(letter) + shift <= ord("z")
+            ):
                 new_word += chr(ord(letter) + shift)
-            elif ((ord(letter) < ord("A")) 
+            elif (
+                (ord(letter) < ord("A"))
                 or (ord("Z") < ord(letter) < ord("a"))
-                or (ord(letter) > ord("z"))):
+                or (ord(letter) > ord("z"))
+            ):
                 new_word += letter
             else:
                 new_word += chr(ord(letter) - (26 + shift))
             if len(new_word) == len(word):
                 if new_word == ciphertext:
                     return shift
-            new_word = ''
+            new_word = ""
 
 
 def caesar_breaker(ciphertext: str, dictionary: tp.Set[str]) -> int:
@@ -97,7 +101,7 @@ def caesar_breaker(ciphertext: str, dictionary: tp.Set[str]) -> int:
             return 0
         if len(ciphertext) not in [len(_) for _ in dictionary]:
             raise ValueError("Can't find anything to compare (Different word lengths)")
-        new_word = ''
+        new_word = ""
         if ciphertext == word:
             return 0
         for shift in range(1, 26):
@@ -118,6 +122,6 @@ def caesar_breaker(ciphertext: str, dictionary: tp.Set[str]) -> int:
                 if len(new_word) == len(word):
                     if new_word == ciphertext:
                         return shift
-                    new_word = ''
+                    new_word = ""
 
     return shift
