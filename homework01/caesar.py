@@ -64,30 +64,6 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     return plaintext
 
 
-def selection(ciphertext: str, word: str) -> int:
-    new_word = ""
-    if ciphertext == word:
-        return 0
-    for shift in range(1, 26):
-        for letter in word:
-            if (ord("A") <= ord(letter) + shift <= ord("Z")) or (
-                ord("a") <= ord(letter) + shift <= ord("z")
-            ):
-                new_word += chr(ord(letter) + shift)
-            elif (
-                (ord(letter) < ord("A"))
-                or (ord("Z") < ord(letter) < ord("a"))
-                or (ord(letter) > ord("z"))
-            ):
-                new_word += letter
-            else:
-                new_word += chr(ord(letter) - (26 + shift))
-            if len(new_word) == len(word):
-                if new_word == ciphertext:
-                    return shift
-            new_word = ""
-
-
 def caesar_breaker(ciphertext: str, dictionary: tp.Set[str]) -> int:
     """
     >>> d = {"python", "java", "ruby"}
