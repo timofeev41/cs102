@@ -35,6 +35,27 @@ def gcd(a: int, b: int) -> int:
     return a
 
 
+def ext_gcd(a: int, b: int) -> tuple:
+    """
+    Extended gcd algorithm
+
+    >>> ext_gcd(2, 6)
+    (2, 1, 0)
+    >>> ext_gcd(12, 9)
+    (3, 1, -1)
+    >>> ext_gcd(0, 0)
+    (0, 0, 1)
+    """
+    if not a:
+        return b, 0, 1
+
+    g, x1, y1 = ext_gcd(b % a, a)
+    x = y1 - (b // a) * x1
+    y = x1
+
+    return g, x, y
+
+
 def multiplicative_inverse(e: int, phi: int) -> int:
     """
     Euclid's extended algorithm for finding the multiplicative
@@ -43,23 +64,6 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     >>> multiplicative_inverse(7, 40)
     23
     """
-
-    def ext_gcd(a: int, b: int) -> int:
-        """
-        Extended gcd algorithm
-        
-        >>> ext_gcd(2, 6)
-        '(2, 1, 0)'
-        """
-        if not a:
-            return b, 0, 1
-
-        g, x1, y1 = ext_gcd(b % a, a)
-        x = y1 - (b // a) * x1
-        y = x1
-
-        return g, x, y
-
     _, new_x, _ = ext_gcd(e, phi)
     return (new_x + phi) % phi
 
