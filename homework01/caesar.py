@@ -63,7 +63,7 @@ def caesar_breaker(ciphertext: str, dictionary: tp.Set[str]) -> int:
         if ciphertext == word:
             return 0
         if len(ciphertext) not in [len(_) for _ in dictionary]:
-            raise ValueError("Can't find anything to compare (Different word lengths)")
+            raise Exception("Can't find anything to compare (Different word lengths)")
         if ciphertext == word:
             return 0
         for shift in range(1, 26):
