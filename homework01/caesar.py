@@ -14,15 +14,15 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     >>> encrypt_caesar("")
     ''
     """
-    ciphertext = ''
+    ciphertext = ""
     for letter in plaintext:
-        if (65 <= ord(letter) + 3 <= 90) or (97 <= ord(letter) + 3 <= 122):
-            ciphertext += chr(ord(letter) + 3)
-        elif (ord(letter) < 65) or (90 < ord(letter) < 97) or (ord(letter) > 122):
-            ciphertext += letter
+        if not letter.isalpha():
+            ciphertext += str(letter)
+            continue
+        if letter.isupper():
+            ciphertext += str(chr((ord(letter) + shift - ord("A")) % 26 + ord("A")))
         else:
-            ciphertext += chr(ord(letter) - 23)
-            
+            ciphertext += str(chr((ord(letter) + shift - ord("a")) % 26 + ord("a")))
     return ciphertext
 
 
@@ -40,14 +40,34 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     ''
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
+    for letter in ciphertext:
+        if not letter.isalpha():
+            plaintext += str(letter)
+            continue
+        if letter.isupper():
+            plaintext += str(chr((ord(letter) - shift - ord("A")) % 26 + ord("A")))
+        else:
+            plaintext += str(chr((ord(letter) - shift - ord("a")) % 26 + ord("a")))
     return plaintext
 
 
-def caesar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
+def caesar_breaker(ciphertext: str, dictionary: tp.Set[str]) -> int:
     """
-    Brute force breaking a Caesar cipher.
+    >>> d = {"python", "java", "ruby"}
+    >>> caesar_breaker("python", d)
+    0
+    >>> caesar_breaker("sbwkrq", d)
+    3
     """
-    best_shift = 0
-    # PUT YOUR CODE HERE
-    return best_shift
+    for word in dictionary:
+        if ciphertext == word:
+            return 0
+        if len(ciphertext) not in [len(_) for _ in dictionary]:
+            raise Exception("Can't find anything to compare (Different word lengths)")
+        if ciphertext == word:
+            return 0
+        for shift in range(1, 26):
+            new_word = decrypt_caesar(word, shift)
+            if new_word == ciphertext:
+                return shift
+    return shift
