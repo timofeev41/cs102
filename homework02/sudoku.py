@@ -89,11 +89,15 @@ def find_empty_positions(grid: List[List[str]]) -> Optional[Tuple[int, int]]:
     >>> find_empty_positions([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']])
     (2, 0)
     """
-    pass
+    for row in range(len(grid)):
+        for column in grid[row]:
+            if column == ".":
+                return (row, grid[row].index(column))
+    return None
 
 
 def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str]:
-    """ Вернуть множество возможных значения для указанной позиции
+    """ Вернуть множество возможных значений для указанной позиции
 
     >>> grid = read_sudoku('puzzle1.txt')
     >>> values = find_possible_values(grid, (0,2))
@@ -103,7 +107,9 @@ def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str
     >>> values == {'2', '5', '9'}
     True
     """
-    pass
+    static = set("123456789")
+    new_block = set(get_block(grid,pos))
+    return static - new_block - set(get_row(grid, pos)) - set(get_col(grid, pos))
 
 
 def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
@@ -117,10 +123,27 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
 
     >>> grid = read_sudoku('puzzle1.txt')
     >>> solve(grid)
-    [['5', '3', '4', '6', '7', '8', '9', '1', '2'], ['6', '7', '2', '1', '9', '5', '3', '4', '8'], ['1', '9', '8', '3', '4', '2', '5', '6', '7'], ['8', '5', '9', '7', '6', '1', '4', '2', '3'], ['4', '2', '6', '8', '5', '3', '7', '9', '1'], ['7', '1', '3', '9', '2', '4', '8', '5', '6'], ['9', '6', '1', '5', '3', '7', '2', '8', '4'], ['2', '8', '7', '4', '1', '9', '6', '3', '5'], ['3', '4', '5', '2', '8', '6', '1', '7', '9']]
+    [ ['5', '3', '4', '6', '7', '8', '9', '1', '2'], 
+      ['6', '7', '2', '1', '9', '5', '3', '4', '8'], 
+      ['1', '9', '8', '3', '4', '2', '5', '6', '7'], 
+      ['8', '5', '9', '7', '6', '1', '4', '2', '3'], 
+      ['4', '2', '6', '8', '5', '3', '7', '9', '1'], 
+      ['7', '1', '3', '9', '2', '4', '8', '5', '6'], 
+      ['9', '6', '1', '5', '3', '7', '2', '8', '4'], 
+      ['2', '8', '7', '4', '1', '9', '6', '3', '5'], 
+      ['3', '4', '5', '2', '8', '6', '1', '7', '9'] ]
     """
-    pass
-
+    if find_empty_positions(grid) == None:
+        print("Пазл уже решен!")
+        return grid
+    col, row = find_empty_positions(grid)
+    for value in find_possible_values(grid, find_empty_positions(grid)):
+        grid[col][row] = value
+        if solve(grid):
+            return solve(grid)
+        else:
+            grid[col][row] = "."
+    return None
 
 def check_solution(solution: List[List[str]]) -> bool:
     """ Если решение solution верно, то вернуть True, в противном случае False """
