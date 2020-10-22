@@ -11,7 +11,7 @@ def read_sudoku(filename: str) -> List[List[str]]:
 
 
 def display(grid: List[List[str]]) -> None:
-    """Вывод Судоку """
+    """ Вывод Судоку """
     width = 2
     line = "+".join(["-" * (width * 3)] * 3)
     for row in range(9):
@@ -156,9 +156,9 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
 
 
 def check_solution(solution: List[List[str]]) -> bool:
-    """ 
-    Если решение solution верно, то вернуть True, в противном случае False 
-    
+    """
+    Если решение solution верно, то вернуть True, в противном случае False
+
     >>> grid = read_sudoku('puzzle1.txt')
     >>> grid[4][2] = 0
     >>> check_solution(grid)
@@ -168,7 +168,6 @@ def check_solution(solution: List[List[str]]) -> bool:
     >>> check_solution(solve(grid))
     True
     """
-    # TODO: Add doctests with bad puzzles
     for row in range(len(solution)):
         if set(get_row(solution, (row, 0))) != set("123456789"):
             return False
