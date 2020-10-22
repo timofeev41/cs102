@@ -1,10 +1,11 @@
 from typing import Tuple, List, Set, Optional
 import random as random
+import time as time
 
 
 def read_sudoku(filename: str) -> List[List[str]]:
     """ Прочитать Судоку из указанного файла """
-    digits = [c for c in open(filename).read() if c in '123456789.']
+    digits = [c for c in open(filename).read() if c in "123456789."]
     grid = group(digits, 9)
     return grid
 
@@ -12,15 +13,20 @@ def read_sudoku(filename: str) -> List[List[str]]:
 def display(grid: List[List[str]]) -> None:
     """Вывод Судоку """
     width = 2
-    line = '+'.join(['-' * (width * 3)] * 3)
+    line = "+".join(["-" * (width * 3)] * 3)
     for row in range(9):
-        print(''.join(grid[row][col].center(width) + ('|' if str(col) in '25' else '') for col in range(9)))
-        if str(row) in '25':
+        print(
+            "".join(
+                grid[row][col].center(width) + ("|" if str(col) in "25" else "")
+                for col in range(9)
+            )
+        )
+        if str(row) in "25":
             print(line)
     print()
 
 
-def group(values: List[str], n: int) -> List[List[str]]:
+def group(values: List[str], number_of_elements: int) -> List[List[str]]:
     """
     Сгруппировать значения values в список, состоящий из списков по n элементов
 
@@ -30,9 +36,10 @@ def group(values: List[str], n: int) -> List[List[str]]:
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     """
     result = []
-    for val in range(0, len(values)-1, n):
-        result.append(values[val:val+n])
+    for val in range(0, len(values) - 1, number_of_elements):
+        result.append(values[val : val + number_of_elements])
     return result
+
 
 def get_row(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
     """ Возвращает все значения для номера строки, указанной в pos
@@ -61,6 +68,7 @@ def get_col(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
     for column in grid:
         result.append(column[pos[1]])
     return result
+
 
 def get_block(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
     """ Возвращает все значения из квадрата, в который попадает позиция pos
@@ -108,7 +116,7 @@ def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str
     >>> values == {'2', '5', '9'}
     True
     """
-    static_set = set('123456789')
+    static_set = set("123456789")
     row_set = set(get_row(grid, pos))
     col_set = set(get_col(grid, pos))
     block_set = set(get_block(grid, pos))
@@ -143,8 +151,7 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
         grid[pos[0]][pos[1]] = value
         if solve(grid):
             return solve(grid)
-        else:
-            grid[pos[0]][pos[1]] = '.'
+        grid[pos[0]][pos[1]] = "."
     return None
 
 
@@ -163,18 +170,19 @@ def check_solution(solution: List[List[str]]) -> bool:
     """
     # TODO: Add doctests with bad puzzles
     for row in range(len(solution)):
-        if set(get_row(solution, (row, 0))) != set('123456789'):
+        if set(get_row(solution, (row, 0))) != set("123456789"):
             return False
     for col in range(len(solution)):
-        if set(get_col(solution, (0, col))) != set('123456789'):
+        if set(get_col(solution, (0, col))) != set("123456789"):
             return False
     for row in (0, 3, 6):
         for col in (0, 3, 6):
-            if set(get_block(solution, (row, col))) != set('123456789'):
+            if set(get_block(solution, (row, col))) != set("123456789"):
                 return False
     return True
 
-def generate_sudoku(N: int) -> List[List[str]]:
+
+def generate_sudoku(number_of_elements: int) -> List[List[str]]:
     """ Генерация судоку заполненного на N элементов
 
     >>> grid = generate_sudoku(40)
@@ -196,25 +204,29 @@ def generate_sudoku(N: int) -> List[List[str]]:
     >>> check_solution(solution)
     True
     """
-    if N > 9*9:
-        N = 9*9
+    if number_of_elements > 9 * 9:
+        number_of_elements = 9 * 9
     new_grid = solve([["." for _ in range(9)] for _ in range(9)])
     deleted_values = 0
-    while N + deleted_values < 81:
+    while number_of_elements + deleted_values < 81:
         random_col = random.randint(0, 8)
         random_row = random.randint(0, 8)
-        if new_grid[random_col][random_row] != '.':
-            new_grid[random_col][random_row] = '.'
+        if new_grid[random_col][random_row] != ".":
+            new_grid[random_col][random_row] = "."
             deleted_values += 1
     return new_grid
 
-if __name__ == '__main__':
-    for fname in ['puzzle1.txt', 'puzzle2.txt', 'puzzle3.txt']:
+
+if __name__ == "__main__":
+    for fname in ["puzzle1.txt", "puzzle2.txt", "puzzle3.txt"]:
         grid = read_sudoku(fname)
+        print(f"Trying to solve {fname} \n")
         display(grid)
         solution = solve(grid)
+        time.sleep(3)
         if not solution:
             print(f"Puzzle {fname} can't be solved \n")
         else:
             print(f"Puzzle {fname} can be solved in this way: \n")
             display(solution)
+        time.sleep(3)
