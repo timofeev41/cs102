@@ -1,4 +1,5 @@
 from typing import Tuple, List, Set, Optional
+import random as random
 
 
 def read_sudoku(filename: str) -> List[List[str]]:
@@ -93,7 +94,7 @@ def find_empty_positions(grid: List[List[str]]) -> Optional[Tuple[int, int]]:
         for column in grid[row]:
             if column == ".":
                 return (row, grid[row].index(column))
-    return None
+    return (-9, -9)
 
 
 def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str]:
@@ -107,9 +108,11 @@ def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str
     >>> values == {'2', '5', '9'}
     True
     """
-    static = set("123456789")
-    new_block = set(get_block(grid,pos))
-    return static - new_block - set(get_row(grid, pos)) - set(get_col(grid, pos))
+    static_set = set('123456789')
+    row_set = set(get_row(grid, pos))
+    col_set = set(get_col(grid, pos))
+    block_set = set(get_block(grid, pos))
+    return static_set - row_set - block_set - col_set
 
 
 def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
@@ -133,23 +136,43 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
       ['2', '8', '7', '4', '1', '9', '6', '3', '5'], 
       ['3', '4', '5', '2', '8', '6', '1', '7', '9'] ]
     """
-    if find_empty_positions(grid) == None:
-        print("Пазл уже решен!")
+    if find_empty_positions(grid) == (-9, -9):
         return grid
-    col, row = find_empty_positions(grid)
-    for value in find_possible_values(grid, find_empty_positions(grid)):
-        grid[col][row] = value
+    pos = find_empty_positions(grid)
+    for value in find_possible_values(grid, pos):
+        grid[pos[0]][pos[1]] = value
         if solve(grid):
             return solve(grid)
         else:
-            grid[col][row] = "."
+            grid[pos[0]][pos[1]] = '.'
     return None
 
-def check_solution(solution: List[List[str]]) -> bool:
-    """ Если решение solution верно, то вернуть True, в противном случае False """
-    # TODO: Add doctests with bad puzzles
-    pass
 
+def check_solution(solution: List[List[str]]) -> bool:
+    """ 
+    Если решение solution верно, то вернуть True, в противном случае False 
+    
+    >>> grid = read_sudoku('puzzle1.txt')
+    >>> grid[4][2] = 0
+    >>> check_solution(grid)
+    False
+
+    >>> grid = read_sudoku('puzzle2.txt')
+    >>> check_solution(solve(grid))
+    True
+    """
+    # TODO: Add doctests with bad puzzles
+    for row in range(len(solution)):
+        if set(get_row(solution, (row, 0))) != set('123456789'):
+            return False
+    for col in range(len(solution)):
+        if set(get_col(solution, (0, col))) != set('123456789'):
+            return False
+    for row in (0, 3, 6):
+        for col in (0, 3, 6):
+            if set(get_block(solution, (row, col))) != set('123456789'):
+                return False
+    return True
 
 def generate_sudoku(N: int) -> List[List[str]]:
     """ Генерация судоку заполненного на N элементов
@@ -173,8 +196,17 @@ def generate_sudoku(N: int) -> List[List[str]]:
     >>> check_solution(solution)
     True
     """
-    pass
-
+    if N > 9*9:
+        N = 9*9
+    new_grid = solve([["." for _ in range(9)] for _ in range(9)])
+    deleted_values = 0
+    while N + deleted_values < 81:
+        random_col = random.randint(0, 8)
+        random_row = random.randint(0, 8)
+        if new_grid[random_col][random_row] != '.':
+            new_grid[random_col][random_row] = '.'
+            deleted_values += 1
+    return new_grid
 
 if __name__ == '__main__':
     for fname in ['puzzle1.txt', 'puzzle2.txt', 'puzzle3.txt']:
@@ -182,6 +214,7 @@ if __name__ == '__main__':
         display(grid)
         solution = solve(grid)
         if not solution:
-            print(f"Puzzle {fname} can't be solved")
+            print(f"Puzzle {fname} can't be solved \n")
         else:
+            print(f"Puzzle {fname} can be solved in this way: \n")
             display(solution)
