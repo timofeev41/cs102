@@ -88,7 +88,7 @@ def get_block(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
     return block_values
 
 
-def find_empty_positions(grid: List[List[str]]) -> Optional[Tuple[int, int]]:
+def find_empty_positions(grid: List[List[str]]) -> Tuple[int, int]:
     """ Найти первую свободную позицию в пазле
 
     >>> find_empty_positions([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']])
@@ -102,7 +102,7 @@ def find_empty_positions(grid: List[List[str]]) -> Optional[Tuple[int, int]]:
         for column in grid[row]:
             if column == ".":
                 return (row, grid[row].index(column))
-    return (-9, -9)
+    return -9, -9
 
 
 def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str]:
@@ -222,10 +222,10 @@ if __name__ == "__main__":
         print(f"Trying to solve {fname} \n")
         display(grid)
         solution = solve(grid)
-        time.sleep(3)
+        # time.sleep(3)
         if not solution:
             print(f"Puzzle {fname} can't be solved \n")
         else:
             print(f"Puzzle {fname} can be solved in this way: \n")
             display(solution)
-        time.sleep(3)
+        # time.sleep(3)
