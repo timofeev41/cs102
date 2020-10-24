@@ -1,6 +1,5 @@
 from typing import Tuple, List, Set, Optional
 import random as random
-import time as time
 
 
 def read_sudoku(filename: str) -> List[List[str]]:
@@ -88,7 +87,7 @@ def get_block(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
     return block_values
 
 
-def find_empty_positions(grid: List[List[str]]) -> Tuple[int, int]:
+def find_empty_positions(grid: List[List[str]]) -> Optional[Tuple[int, int]]:
     """Найти первую свободную позицию в пазле
 
     >>> find_empty_positions([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']])
@@ -101,8 +100,8 @@ def find_empty_positions(grid: List[List[str]]) -> Tuple[int, int]:
     for row in range(len(grid)):
         for column in grid[row]:
             if column == ".":
-                return (row, grid[row].index(column))
-    return -9, -9
+                return row, grid[row].index(column)
+    return None
 
 
 def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str]:
@@ -123,7 +122,7 @@ def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str
     return static_set - row_set - block_set - col_set
 
 
-def solve(grid: List[List[str]]) -> List[List[str]]:
+def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
     """ Решение пазла, заданного в grid """
     """ Как решать Судоку?
         1. Найти свободную позицию
@@ -144,15 +143,16 @@ def solve(grid: List[List[str]]) -> List[List[str]]:
       ['2', '8', '7', '4', '1', '9', '6', '3', '5'], 
       ['3', '4', '5', '2', '8', '6', '1', '7', '9'] ]
     """
-    if find_empty_positions(grid) == (-9, -9):
-        return grid
     pos = find_empty_positions(grid)
+    if pos is None:
+        return grid
+    row, col = pos
     for value in find_possible_values(grid, pos):
-        grid[pos[0]][pos[1]] = value
-        if solve(grid):
+        grid[row][col] = value
+        if solve(grid) is not None:
             return solve(grid)
-        grid[pos[0]][pos[1]] = "."
-    return []
+        grid[row][col] = "."
+    return None
 
 
 def check_solution(solution: List[List[str]]) -> bool:
@@ -210,10 +210,14 @@ def generate_sudoku(number_of_elements: int) -> List[List[str]]:
     while number_of_elements + deleted_values < 81:
         random_col = random.randint(0, 8)
         random_row = random.randint(0, 8)
-        if new_grid[random_col][random_row] != ".":
-            new_grid[random_col][random_row] = "."
-            deleted_values += 1
-    return new_grid
+        if new_grid is not None:
+            if new_grid[random_col][random_row] != ".":
+                new_grid[random_col][random_row] = "."
+                deleted_values += 1
+    if new_grid is not None:
+        return new_grid
+    else:
+        return []
 
 
 if __name__ == "__main__":
@@ -222,10 +226,8 @@ if __name__ == "__main__":
         print(f"Trying to solve {fname} \n")
         display(grid)
         solution = solve(grid)
-        # time.sleep(3)
         if not solution:
             print(f"Puzzle {fname} can't be solved \n")
         else:
             print(f"Puzzle {fname} can be solved in this way: \n")
             display(solution)
-        # time.sleep(3)
