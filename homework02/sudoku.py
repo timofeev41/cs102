@@ -123,7 +123,7 @@ def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str
     return static_set - row_set - block_set - col_set
 
 
-def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
+def solve(grid: List[List[str]]) -> List[List[str]]:
     """ Решение пазла, заданного в grid """
     """ Как решать Судоку?
         1. Найти свободную позицию
@@ -152,7 +152,7 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
         if solve(grid):
             return solve(grid)
         grid[pos[0]][pos[1]] = "."
-    return None
+    return []
 
 
 def check_solution(solution: List[List[str]]) -> bool:
