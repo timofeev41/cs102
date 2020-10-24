@@ -42,7 +42,7 @@ def group(values: List[str], number_of_elements: int) -> List[List[str]]:
 
 
 def get_row(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
-    """ Возвращает все значения для номера строки, указанной в pos
+    """Возвращает все значения для номера строки, указанной в pos
 
     >>> get_row([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']], (0, 0))
     ['1', '2', '.']
@@ -55,7 +55,7 @@ def get_row(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
 
 
 def get_col(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
-    """ Возвращает все значения для номера столбца, указанного в pos
+    """Возвращает все значения для номера столбца, указанного в pos
 
     >>> get_col([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']], (0, 0))
     ['1', '4', '7']
@@ -71,7 +71,7 @@ def get_col(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
 
 
 def get_block(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
-    """ Возвращает все значения из квадрата, в который попадает позиция pos
+    """Возвращает все значения из квадрата, в который попадает позиция pos
 
     >>> grid = read_sudoku('puzzle1.txt')
     >>> get_block(grid, (0, 1))
@@ -89,7 +89,7 @@ def get_block(grid: List[List[str]], pos: Tuple[int, int]) -> List[str]:
 
 
 def find_empty_positions(grid: List[List[str]]) -> Tuple[int, int]:
-    """ Найти первую свободную позицию в пазле
+    """Найти первую свободную позицию в пазле
 
     >>> find_empty_positions([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']])
     (0, 2)
@@ -106,7 +106,7 @@ def find_empty_positions(grid: List[List[str]]) -> Tuple[int, int]:
 
 
 def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str]:
-    """ Вернуть множество возможных значений для указанной позиции
+    """Вернуть множество возможных значений для указанной позиции
 
     >>> grid = read_sudoku('puzzle1.txt')
     >>> values = find_possible_values(grid, (0,2))
@@ -182,7 +182,7 @@ def check_solution(solution: List[List[str]]) -> bool:
 
 
 def generate_sudoku(number_of_elements: int) -> List[List[str]]:
-    """ Генерация судоку заполненного на N элементов
+    """Генерация судоку заполненного на N элементов
 
     >>> grid = generate_sudoku(40)
     >>> sum(1 for row in grid for e in row if e == '.')
