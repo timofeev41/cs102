@@ -214,10 +214,7 @@ def generate_sudoku(number_of_elements: int) -> List[List[str]]:
             if new_grid[random_col][random_row] != ".":
                 new_grid[random_col][random_row] = "."
                 deleted_values += 1
-    if new_grid is not None:
-        return new_grid
-    else:
-        return []
+    return new_grid # type: ignore
 
 
 if __name__ == "__main__":
