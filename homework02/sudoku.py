@@ -149,8 +149,9 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
     row, col = pos
     for value in find_possible_values(grid, pos):
         grid[row][col] = value
-        if solve(grid) is not None:
-            return solve(grid)
+        solved_sudoku = solve(grid)
+        if solved_sudoku is not None:
+            return solved_sudoku
         grid[row][col] = "."
     return None
 
