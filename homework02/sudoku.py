@@ -25,7 +25,7 @@ def display(grid: List[List[str]]) -> None:
     print()
 
 
-def group(values: List[str], number_of_elements: int) -> List[List[str]]:
+def group(values: List[str], n: int) -> List[List[str]]:
     """
     Сгруппировать значения values в список, состоящий из списков по n элементов
 
@@ -35,8 +35,8 @@ def group(values: List[str], number_of_elements: int) -> List[List[str]]:
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     """
     result = []
-    for val in range(0, len(values) - 1, number_of_elements):
-        result.append(values[val : val + number_of_elements])
+    for val in range(0, len(values) - 1, n):
+        result.append(values[val : val + n])
     return result
 
 
@@ -144,13 +144,14 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
       ['3', '4', '5', '2', '8', '6', '1', '7', '9'] ]
     """
     pos = find_empty_positions(grid)
+    solved_sudoku = solve(grid)
     if pos is None:
         return grid
     row, col = pos
     for value in find_possible_values(grid, pos):
         grid[row][col] = value
-        if solve(grid) is not None:
-            return solve(grid)
+        if solved_sudoku is not None:
+            return solved_sudoku
         grid[row][col] = "."
     return None
 
@@ -181,7 +182,7 @@ def check_solution(solution: List[List[str]]) -> bool:
     return True
 
 
-def generate_sudoku(number_of_elements: int) -> List[List[str]]:
+def generate_sudoku(n: int) -> List[List[str]]:
     """Генерация судоку заполненного на N элементов
 
     >>> grid = generate_sudoku(40)
@@ -203,11 +204,11 @@ def generate_sudoku(number_of_elements: int) -> List[List[str]]:
     >>> check_solution(solution)
     True
     """
-    if number_of_elements > 9 * 9:
-        number_of_elements = 9 * 9
+    if n > 9 * 9:
+        n = 9 * 9
     new_grid = solve([["." for _ in range(9)] for _ in range(9)])
     deleted_values = 0
-    while number_of_elements + deleted_values < 81:
+    while n + deleted_values < 81:
         random_col = random.randint(0, 8)
         random_row = random.randint(0, 8)
         if new_grid is not None:
