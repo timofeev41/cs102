@@ -144,14 +144,13 @@ def solve(grid: List[List[str]]) -> Optional[List[List[str]]]:
       ['3', '4', '5', '2', '8', '6', '1', '7', '9'] ]
     """
     pos = find_empty_positions(grid)
-    solved_sudoku = solve(grid)
     if pos is None:
         return grid
     row, col = pos
     for value in find_possible_values(grid, pos):
         grid[row][col] = value
-        if solved_sudoku is not None:
-            return solved_sudoku
+        if solve(grid) is not None:
+            return solve(grid)
         grid[row][col] = "."
     return None
 
@@ -216,7 +215,6 @@ def generate_sudoku(n: int) -> List[List[str]]:
                 new_grid[random_col][random_row] = "."
                 deleted_values += 1
     return new_grid # type: ignore
-
 
 if __name__ == "__main__":
     for fname in ["puzzle1.txt", "puzzle2.txt", "puzzle3.txt"]:
