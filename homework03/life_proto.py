@@ -72,13 +72,15 @@ class GameOfLife:
         out : Grid
             Матрица клеток размером `cell_height` х `cell_width`.
         """
-        pass
+        if randomize:
+            return [[random.randint(0, 1) for _ in range(self.cell_height)] for _ in range(self.cell_width)]
+        return [[0 for _ in range(self.cell_height)] for _ in range(self.cell_width)]
 
     def draw_grid(self) -> None:
         """
         Отрисовка списка клеток с закрашиванием их в соответствующе цвета.
         """
-        pass
+        grid = self.create_grid(True)
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
@@ -110,3 +112,7 @@ class GameOfLife:
             Новое поколение клеток.
         """
         pass
+
+if __name__ == '__main__':
+    game = GameOfLife(320, 240, 20)
+    game.run()
