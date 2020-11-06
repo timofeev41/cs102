@@ -108,7 +108,15 @@ class GameOfLife:
         out : Cells
             Список соседних клеток.
         """
-        pass
+        neighbours = []
+        rows = len(self.grid)
+        cols = len(self.grid[0]) if rows else 0
+        for i in range(max(0, cell[0] - 1), min(rows, cell[0] + 2)):
+            for j in range(max(0, cell[1] - 1), min(cols, cell[1] + 2)):
+                if (i, j) != cell:
+                    neighbours.append(self.grid[i][j])
+        return neighbours
+
 
     def get_next_generation(self) -> Grid:
         """
@@ -119,7 +127,7 @@ class GameOfLife:
         out : Grid
             Новое поколение клеток.
         """
-        pass
+        
 
 if __name__ == '__main__':
     game = GameOfLife(320, 240, 20)
