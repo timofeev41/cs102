@@ -50,7 +50,7 @@ class GameOfLife:
                 if event.type == QUIT:
                     running = False
             self.draw_lines()
-            # self.grid = self.get_next_generation()
+            self.grid = self.get_next_generation()
             self.draw_grid()
             pygame.display.flip()
             clock.tick(self.speed)
