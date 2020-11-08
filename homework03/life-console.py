@@ -50,5 +50,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--randomize", type=int, default=1, help="Should grid be randomized?")
     arguments = parser.parse_args()
-    gui = Console(GameOfLife((arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations))
+    gui = Console(
+        GameOfLife((arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations)
+    )
     gui.run()

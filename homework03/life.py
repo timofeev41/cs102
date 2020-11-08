@@ -65,7 +65,7 @@ class GameOfLife:
         """
         neighbours = []
         rows = len(self.curr_generation)
-        cols = len(self.curr_generation[0]) if rows else 0
+        cols = len(self.curr_generation[1]) if rows else 0
         for row in range(max(0, cell[0] - 1), min(rows, cell[0] + 2)):
             for col in range(max(0, cell[1] - 1), min(cols, cell[1] + 2)):
                 if (row, col) != cell:
