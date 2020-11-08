@@ -1,3 +1,4 @@
+import argparse
 import curses
 
 from life import GameOfLife
@@ -37,3 +38,17 @@ class Console(UI):
             self.draw_borders(win)
             win.refresh()
         curses.endwin()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="GameOfLife")
+    parser.add_argument("--rows", type=int, default=20, help="Enter number of rows in grid")
+    parser.add_argument("--cols", type=int, default=40, help="Enter number of columns in grid")
+    parser.add_argument("--speed", type=int, default=10, help="Enter game speed")
+    parser.add_argument(
+        "--maxgenerations", type=int, default=1000, help="Enter max number of generations"
+    )
+    parser.add_argument("--randomize", type=int, default=1, help="Should grid be randomized?")
+    arguments = parser.parse_args()
+    gui = Console(GameOfLife((arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations))
+    gui.run()
