@@ -17,9 +17,9 @@ class Console(UI):
         """ Отобразить состояние клеток. """
         for pos_x, row in enumerate(self.life.curr_generation):
             for pos_y, value in enumerate(row):
-                simbol = "@" if value else " "
+                symbol = arguments.symbol if value else " "
                 try:
-                    screen.addstr(pos_x + 1, pos_y + 1, simbol)
+                    screen.addstr(pos_x + 1, pos_y + 1, symbol)
                 except curses.error:
                     continue
 
@@ -49,6 +49,9 @@ if __name__ == "__main__":
         "--maxgenerations", type=int, default=1000, help="Enter max number of generations"
     )
     parser.add_argument("--randomize", type=int, default=1, help="Should grid be randomized?")
+    parser.add_argument(
+        "--symbol", type=str, default="@", help="Select a symbol to display live cells"
+    )
     arguments = parser.parse_args()
     gui = Console(
         GameOfLife((arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations)
