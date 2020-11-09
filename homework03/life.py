@@ -131,11 +131,11 @@ class GameOfLife:
         path = filename
         with path.open() as file:
             raw_grid = file.read().split("\n")
-        grid: tp.List[tp.List[tp.Any]]
+        grid: tp.List[tp.List[int]]
         grid = [[] for _ in range(len(raw_grid))]
         for pos_x, row in enumerate(raw_grid):
             for _, value in enumerate(row):
-                grid[pos_x].append(value)
+                grid[pos_x].append(int(value))
         new_game = GameOfLife(size=(len(grid), len(grid[0])))
         new_game.curr_generation = grid
         return new_game
