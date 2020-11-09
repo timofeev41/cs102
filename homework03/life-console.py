@@ -19,14 +19,14 @@ class Console(UI):
             for pos_y, value in enumerate(row):
                 symbol = arguments.symbol if value else " "
                 try:
-                    screen.addstr(pos_x + 1, pos_y + 1, symbol)
+                    screen.addstr(pos_y + 1, pos_x + 1, symbol, curses.A_STANDOUT)
                 except curses.error:
                     continue
 
     def run(self) -> None:
         win = curses.initscr()
         curses.curs_set(0)
-        win = curses.newwin(self.life.cols + 1, self.life.rows + 1, 0, 0)
+        win = curses.newwin(self.life.rows + 2, self.life.cols + 2, 0, 0)
         self.life.curr_generation = self.life.create_grid(True)
         running = True
         while running:
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GameOfLife")
     parser.add_argument("--rows", type=int, default=20, help="Enter number of rows in grid")
     parser.add_argument("--cols", type=int, default=40, help="Enter number of columns in grid")
-    parser.add_argument("--speed", type=int, default=10, help="Enter game speed")
+    parser.add_argument("--speed", type=int, default=1, help="Enter game speed")
     parser.add_argument(
         "--maxgenerations", type=int, default=1000, help="Enter max number of generations"
     )
