@@ -1,5 +1,6 @@
 import argparse
 import pygame
+from datetime import datetime
 from life import GameOfLife
 from pygame.locals import *
 from ui import UI
@@ -57,6 +58,7 @@ class GUI(UI):
         Пробел - Пауза.
         Esc - Выход из игры.
         Нажатие ЛКМ - "закрасить" клетку.
+        Вверх - сохранение "жизни" в файл вида life_*time*.txt
         """
         clock = pygame.time.Clock()
         pygame.display.set_caption("Game of Life")
@@ -75,6 +77,9 @@ class GUI(UI):
                         running = False
                     if event.key == K_SPACE:  # type: ignore
                         paused = True if not paused else False
+                    if event.key == K_DOWN:  # type: ignore
+                        save_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        self.life.save(Path(f"life_{save_time}.txt"))
                 if event.type == MOUSEBUTTONDOWN:  # type: ignore
                     click_position = pygame.mouse.get_pos()
                     pos_x, pos_y = (
