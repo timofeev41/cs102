@@ -3,6 +3,7 @@ import pygame
 from life import GameOfLife
 from pygame.locals import *
 from ui import UI
+from pathlib import Path
 
 
 class GUI(UI):
@@ -41,8 +42,8 @@ class GUI(UI):
                     self.screen,
                     color,
                     (
-                        self.cell_size * pos_x + 1,
                         self.cell_size * pos_y + 1,
+                        self.cell_size * pos_x + 1,
                         self.cell_size - 1,
                         self.cell_size - 1,
                     ),
@@ -80,10 +81,10 @@ class GUI(UI):
                         click_position[0] // self.cell_size,
                         click_position[1] // self.cell_size,
                     )
-                    if self.life.curr_generation[pos_x][pos_y]:
-                        self.life.curr_generation[pos_x][pos_y] = 0
+                    if self.life.curr_generation[pos_y][pos_x]:
+                        self.life.curr_generation[pos_y][pos_x] = 0
                     else:
-                        self.life.curr_generation[pos_x][pos_y] = 1
+                        self.life.curr_generation[pos_y][pos_x] = 1
             self.draw_lines()
             self.draw_grid()
             if not paused:
@@ -108,15 +109,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--maxgenerations", type=int, default=50, help="Enter max number of generations"
     )
+    parser.add_argument("--grid_path", type=Path, default=None, help="Load grid from file")
     parser.add_argument("--randomize", type=int, default=1, help="Should grid be randomized?")
     arguments = parser.parse_args()
-    gui = GUI(
-        GameOfLife(
-            (arguments.rows, arguments.cols),
-            arguments.randomize,
-            arguments.maxgenerations,
-        ),
-        arguments.size,
-        arguments.speed,
-    )
+    if arguments.grid_path is not None:
+        gui = GUI(GameOfLife.from_file(arguments.grid_path), arguments.size, arguments.speed)
+    else:
+        gui = GUI(
+            GameOfLife(
+                (arguments.rows, arguments.cols),
+                arguments.randomize,
+                arguments.maxgenerations,
+            ),
+            arguments.size,
+            arguments.speed,
+        )
     gui.run()
