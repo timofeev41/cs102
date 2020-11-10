@@ -144,6 +144,8 @@ class GameOfLife:
         """
         Сохранить текущее состояние клеток в указанный файл.
         """
+        if not pathlib.Path("saves").exists():
+            pathlib.Path("saves").mkdir()
         if not pathlib.Path(filename).exists():
             pathlib.Path(filename).touch()
         file = open(filename, "w")
