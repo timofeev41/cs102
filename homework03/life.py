@@ -129,15 +129,12 @@ class GameOfLife:
         """
         Прочитать состояние клеток из указанного файла  .
         """
-        with filename.open() as file:
-            raw_grid = file.read().split("\n")
-        grid: tp.List[tp.List[int]]
-        grid = [[] for _ in range(len(raw_grid))]
-        for pos_x, row in enumerate(raw_grid):
-            for _, value in enumerate(row):
-                grid[pos_x].append(int(value))
-        new_game = GameOfLife((len(grid), len(grid[0])))
-        new_game.curr_generation = grid
+        new_grid = []
+        with open(filename) as file:
+            for row in file:
+                new_grid.append([int(val) for val in row if (val == "0" or val == "1")])
+        new_game = GameOfLife((len(new_grid), len(new_grid[0])))
+        new_game.curr_generation = new_grid
         return new_game
 
     def save(self, filename: pathlib.Path) -> None:
@@ -149,5 +146,7 @@ class GameOfLife:
         if not pathlib.Path(filename).exists():
             pathlib.Path(filename).touch()
         with open(filename, "w") as file:
-            for i in range(len(self.curr_generation)):
-                file.write(str(self.curr_generation[i]) + "\n")
+            for row in range(self.rows):
+                for col in range(self.cols):
+                    file.write(str(self.curr_generation[row][col]))
+                file.write("\n")
