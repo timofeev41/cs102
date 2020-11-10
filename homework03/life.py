@@ -99,11 +99,12 @@ class GameOfLife:
         """
         Выполнить один шаг игры.
         """
-        self.prev_generation, self.curr_generation = (
-            self.curr_generation,
-            self.get_next_generation(),
-        )
-        self.generations += 1
+        if not self.is_max_generations_exceeded:
+            self.prev_generation, self.curr_generation = (
+                self.curr_generation,
+                self.get_next_generation(),
+            )
+            self.generations += 1
 
     @property
     def is_max_generations_exceeded(self) -> bool:
@@ -128,8 +129,7 @@ class GameOfLife:
         """
         Прочитать состояние клеток из указанного файла  .
         """
-        path = filename
-        with path.open() as file:
+        with filename.open() as file:
             raw_grid = file.read().split("\n")
         grid: tp.List[tp.List[int]]
         grid = [[] for _ in range(len(raw_grid))]
@@ -148,7 +148,6 @@ class GameOfLife:
             pathlib.Path("saves").mkdir()
         if not pathlib.Path(filename).exists():
             pathlib.Path(filename).touch()
-        file = open(filename, "w")
-        for i in range(len(self.curr_generation)):
-            file.write(str(self.curr_generation[i]) + "\n")
-        file.close()
+        with open(filename, "w") as file:
+            for i in range(len(self.curr_generation)):
+                file.write(str(self.curr_generation[i]) + "\n")
