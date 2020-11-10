@@ -136,7 +136,7 @@ class GameOfLife:
         for pos_x, row in enumerate(raw_grid):
             for _, value in enumerate(row):
                 grid[pos_x].append(int(value))
-        new_game = GameOfLife(size=(len(grid), len(grid[0])))
+        new_game = GameOfLife((len(grid), len(grid[0])))
         new_game.curr_generation = grid
         return new_game
 
@@ -144,10 +144,9 @@ class GameOfLife:
         """
         Сохранить текущее состояние клеток в указанный файл.
         """
-        path = pathlib.Path(filename)
-        if not path.exists():
-            path.touch()
-        with path.open() as file:
-            for row in range(self.rows):
-                for col in range(self.cols):
-                    file.write(str(self.curr_generation[row][col]))
+        if not pathlib.Path(filename).exists():
+            pathlib.Path(filename).touch()
+        file = open(filename, "w")
+        for i in range(len(self.curr_generation)):
+            file.write(str(self.curr_generation[i]) + "\n")
+        file.close()
