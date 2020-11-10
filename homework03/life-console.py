@@ -20,7 +20,7 @@ class Console(UI):
             for pos_y, value in enumerate(row):
                 symbol = arguments.symbol if value else " "
                 try:
-                    screen.addstr(pos_x + 1, pos_y + 1, symbol, curses.A_STANDOUT)
+                    screen.addstr(pos_y + 1, pos_x + 1, symbol, curses.A_STANDOUT)
                 except curses.error:
                     continue
 
@@ -34,6 +34,7 @@ class Console(UI):
             if not self.life.is_changing or self.life.is_max_generations_exceeded:
                 running = False
             win.clear()
+            curses.delay_output(100)
             self.draw_grid(win)
             self.life.step()
             self.draw_borders(win)
@@ -59,6 +60,8 @@ if __name__ == "__main__":
         gui = Console(GameOfLife.from_file(arguments.grid_path))
     else:
         gui = Console(
-            GameOfLife((arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations)
+            GameOfLife(
+                (arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations
+            )
         )
     gui.run()
