@@ -17,9 +17,11 @@ class Console(UI):
 
     def draw_grid(self, screen) -> None:
         """ Отобразить состояние клеток. """
-        for pos_x, row in enumerate(self.life.curr_generation):
-            for pos_y, value in enumerate(row):
-                symbol = arguments.symbol if value else " "
+        # for pos_x, row in enumerate(self.life.curr_generation):
+        #     for pos_y, value in enumerate(row):
+        for pos_y in range(self.life.cols):
+            for pos_x in range(self.life.rows):
+                symbol = arguments.symbol if self.life.curr_generation[pos_x][pos_y] else " "
                 try:
                     screen.addstr(pos_x + 1, pos_y + 1, symbol, curses.A_STANDOUT)
                 except curses.error:
@@ -28,22 +30,22 @@ class Console(UI):
     def run(self) -> None:
         win = curses.initscr()
         curses.curs_set(0)
-        self.limits = win.getmaxyx()
-        # if arguments.cols > limits[0] or arguments.rows > limits[1]:
-        #     print(
-        #         f"""
-        #     Невозможно отрисовать картинку такого размера.
-        #     Максимально допустимое значение для строк {limits[0] - 2},
-        #     колонн {limits[1] - 2}
-        #     """
-        #     )
-        # win = curses.newwin(self.life.rows + 2, self.life.cols + 2, 0, 0)
+        limits = win.getmaxyx()
+        if arguments.rows > limits[0] or arguments.cols > limits[1]:
+            print(
+                f"""
+            Невозможно отрисовать картинку такого размера.
+            Максимально допустимое значение для строк {limits[0] - 2},
+            колонн {limits[1] - 2}
+            """
+            )
+        win = curses.newwin(self.life.rows + 2, self.life.cols + 2, 0, 0)
         running = True
         while running:
             if not self.life.is_changing or self.life.is_max_generations_exceeded:
                 running = False
             win.clear()
-            curses.delay_output(500)
+            curses.delay_output(50)
             self.draw_borders(win)
             self.draw_grid(win)
             self.life.step()
@@ -53,7 +55,7 @@ class Console(UI):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GameOfLife")
-    parser.add_argument("--rows", type=int, default=20, help="Enter number of rows in grid")
+    parser.add_argument("--rows", type=int, default=10, help="Enter number of rows in grid")
     parser.add_argument("--cols", type=int, default=30, help="Enter number of columns in grid")
     parser.add_argument("--speed", type=int, default=1, help="Enter game speed")
     parser.add_argument(
@@ -65,19 +67,12 @@ if __name__ == "__main__":
         "--symbol", type=str, default="@", help="Select a symbol to display live cells"
     )
     arguments = parser.parse_args()
-    # if arguments.cols > self.limits[0] or arguments.rows > self.limits[1]:
-    #     print(f"""
-    #     Невозможно отрисовать картинку такого размера.
-    #     Максимально допустимое значение для строк {self.limits[0]},
-    #     колонн {self.limits[1]}
-    #     """)
-    # else:
     if arguments.grid_path is not None:
         gui = Console(GameOfLife.from_file(arguments.grid_path))
     else:
         gui = Console(
             GameOfLife(
-                (arguments.cols, arguments.rows), arguments.randomize, arguments.maxgenerations
+                (arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations
             )
         )
     gui.run()

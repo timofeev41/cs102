@@ -81,17 +81,17 @@ class GUI(UI):
                         paused = True if not paused else False
                     if event.key == K_DOWN:  # type: ignore
                         save_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        self.life.save(Path(f"life_{save_time}.txt"))
+                        self.life.save(Path(f"saves/life_{save_time}.txt"))
                 if event.type == MOUSEBUTTONDOWN:  # type: ignore
                     click_position = pygame.mouse.get_pos()
                     pos_x, pos_y = (
-                        click_position[0] // self.cell_size,
                         click_position[1] // self.cell_size,
+                        click_position[0] // self.cell_size,
                     )
-                    if self.life.curr_generation[pos_y][pos_x]:
-                        self.life.curr_generation[pos_y][pos_x] = 0
+                    if self.life.curr_generation[pos_x][pos_y]:
+                        self.life.curr_generation[pos_x][pos_y] = 0
                     else:
-                        self.life.curr_generation[pos_y][pos_x] = 1
+                        self.life.curr_generation[pos_x][pos_y] = 1
             self.draw_lines()
             self.draw_grid()
             if not paused:

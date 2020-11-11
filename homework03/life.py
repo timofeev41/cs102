@@ -45,8 +45,8 @@ class GameOfLife:
             Матрица клеток размером `rows` х `cols`.
         """
         if randomize:
-            return [[random.randint(0, 1) for _ in range(self.rows)] for _ in range(self.cols)]
-        return [[0 for _ in range(self.rows)] for _ in range(self.cols)]
+            return [[random.randint(0, 1) for _ in range(self.cols)] for _ in range(self.rows)]
+        return [[0 for _ in range(self.cols)] for _ in range(self.rows)]
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
