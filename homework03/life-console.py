@@ -9,6 +9,7 @@ from ui import UI
 class Console(UI):
     def __init__(self, life: GameOfLife) -> None:
         super().__init__(life)
+        self.from_file = False
 
     def draw_borders(self, screen) -> None:
         """ Отобразить рамку. """
@@ -28,23 +29,24 @@ class Console(UI):
         win = curses.initscr()
         curses.curs_set(0)
         self.limits = win.getmaxyx()
-        if arguments.cols > self.limits[0] or arguments.rows > self.limits[1]:
-            print(f"""
-            Невозможно отрисовать картинку такого размера.
-            Максимально допустимое значение для строк {self.limits[0] - 2},
-            колонн {self.limits[1] - 2}
-            """)
-            return None
-        win = curses.newwin(self.life.rows + 2, self.life.cols + 2, 0, 0)
+        # if arguments.cols > limits[0] or arguments.rows > limits[1]:
+        #     print(
+        #         f"""
+        #     Невозможно отрисовать картинку такого размера.
+        #     Максимально допустимое значение для строк {limits[0] - 2},
+        #     колонн {limits[1] - 2}
+        #     """
+        #     )
+        # win = curses.newwin(self.life.rows + 2, self.life.cols + 2, 0, 0)
         running = True
         while running:
             if not self.life.is_changing or self.life.is_max_generations_exceeded:
                 running = False
             win.clear()
-            curses.delay_output(100)
+            curses.delay_output(500)
+            self.draw_borders(win)
             self.draw_grid(win)
             self.life.step()
-            self.draw_borders(win)
             win.refresh()
         curses.endwin()
 
@@ -52,7 +54,7 @@ class Console(UI):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GameOfLife")
     parser.add_argument("--rows", type=int, default=20, help="Enter number of rows in grid")
-    parser.add_argument("--cols", type=int, default=20, help="Enter number of columns in grid")
+    parser.add_argument("--cols", type=int, default=30, help="Enter number of columns in grid")
     parser.add_argument("--speed", type=int, default=1, help="Enter game speed")
     parser.add_argument(
         "--maxgenerations", type=int, default=1000, help="Enter max number of generations"
@@ -75,7 +77,7 @@ if __name__ == "__main__":
     else:
         gui = Console(
             GameOfLife(
-                (arguments.rows, arguments.cols), arguments.randomize, arguments.maxgenerations
+                (arguments.cols, arguments.rows), arguments.randomize, arguments.maxgenerations
             )
         )
     gui.run()
