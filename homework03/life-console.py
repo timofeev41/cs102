@@ -1,5 +1,6 @@
 import argparse
 import curses
+from datetime import datetime
 from pathlib import Path
 
 from life import GameOfLife
@@ -39,17 +40,27 @@ class Console(UI):
             колонн {limits[1] - 2}
             """
             )
+        curses.noecho()
         win = curses.newwin(self.life.rows + 2, self.life.cols + 2, 0, 0)
+        win.nodelay(True)
         running = True
+        pause = False
         while running:
             if not self.life.is_changing or self.life.is_max_generations_exceeded:
                 running = False
-            win.clear()
-            curses.delay_output(50)
-            self.draw_borders(win)
-            self.draw_grid(win)
-            self.life.step()
-            win.refresh()
+            char = win.getch()
+            if char == ord(' '):
+                pause = not pause
+            if char == ord('s'):
+                save_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                self.life.save(Path(f"saves/life_{save_time}.txt"))
+            if not pause:
+                win.clear()
+                curses.delay_output(50)
+                self.draw_borders(win)
+                self.draw_grid(win)
+                self.life.step()
+                win.refresh()
         curses.endwin()
 
 
