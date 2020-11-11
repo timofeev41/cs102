@@ -26,6 +26,10 @@ class GUI(UI):
         # Скорость игры
         self.speed = speed
 
+        # Цвета клеток
+        self.primary_color = arguments.primary_color
+        self.secondary_color = arguments.secondary_color
+
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
         for x in range(0, self.width, self.cell_size):
@@ -34,8 +38,6 @@ class GUI(UI):
             pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
 
     def draw_grid(self) -> None:
-        self.primary_color = arguments.primary_color
-        self.secondary_color = arguments.secondary_color
         for pos_x, row in enumerate(self.life.curr_generation):
             for pos_y, col in enumerate(row):
                 color = self.secondary_color
@@ -65,7 +67,6 @@ class GUI(UI):
         clock = pygame.time.Clock()
         pygame.display.set_caption("Game of Life")
         self.screen.fill(pygame.Color("white"))
-        self.grid = self.life.create_grid(True)
         running = True
         paused = False
         while running:
