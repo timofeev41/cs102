@@ -78,9 +78,9 @@ class GUI(UI):
                 if event.type == KEYDOWN:  # type: ignore
                     if event.key == K_ESCAPE:  # type: ignore
                         running = False
-                    if event.key == K_SPACE:  # type: ignore
+                    elif event.key == K_SPACE:  # type: ignore
                         paused = True if not paused else False
-                    if event.key == K_DOWN:  # type: ignore
+                    elif event.key == K_DOWN:  # type: ignore
                         save_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         self.life.save(Path(f"saves/life_{save_time}.txt"))
                 if event.type == MOUSEBUTTONDOWN:  # type: ignore
