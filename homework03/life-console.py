@@ -10,7 +10,6 @@ from ui import UI
 class Console(UI):
     def __init__(self, life: GameOfLife) -> None:
         super().__init__(life)
-        self.from_file = False
 
     def draw_borders(self, screen) -> None:
         """ Отобразить рамку. """
@@ -32,14 +31,8 @@ class Console(UI):
         win = curses.initscr()
         curses.curs_set(0)
         limits = win.getmaxyx()
-        if arguments.rows > limits[0] or arguments.cols > limits[1]:
-            print(
-                f"""
-            Невозможно отрисовать картинку такого размера.
-            Максимально допустимое значение для строк {limits[0] - 2},
-            колонн {limits[1] - 2}
-            """
-            )
+        if arguments.rows > limits[0] - 1 or arguments.cols > limits[1] - 1:
+            raise ValueError(f'Невозможно отрисовать картинку такого размера. Максимальный размер {limits[0]}x{limits[1]}.')
         curses.noecho()
         win = curses.newwin(self.life.rows + 2, self.life.cols + 2, 0, 0)
         win.nodelay(True)
@@ -54,6 +47,8 @@ class Console(UI):
             if char == ord('s'):
                 save_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 self.life.save(Path(f"saves/life_{save_time}.txt"))
+            if char == ord('q'):
+                running = False
             if not pause:
                 win.clear()
                 curses.delay_output(50)
