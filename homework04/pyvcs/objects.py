@@ -11,13 +11,33 @@ from pyvcs.repo import repo_find
 
 
 def hash_object(data: bytes, fmt: str, write: bool = False) -> str:
-    # PUT YOUR CODE HERE
-    ...
+    blob = f"{fmt} {len(data)}".encode()+b"\x00" + data
+    sha = hashlib.sha1(blob).hexdigest()
+    if write:
+        gitdir = repo_find(".")
+        if not pathlib.Path(gitdir / "objects" / sha[:2]).exists():
+            pathlib.Path(gitdir / "objects" / f"{sha[:2]}/").mkdir(parents=True, exist_ok=True)
+            with open(gitdir / "objects" / f"{sha[:2]}/{sha[2:]}", "wb") as f:
+                f.write(zlib.compress(blob))
+    return sha
 
 
 def resolve_object(obj_name: str, gitdir: pathlib.Path) -> tp.List[str]:
-    # PUT YOUR CODE HERE
-    ...
+    content = []
+    danger = Exception(f"Not a valid object name {obj_name}")
+    dir_path = pathlib.Path(gitdir / f"objects/{obj_name[:2]}")
+
+    if len(obj_name) > 20 or len(obj_name) < 4:
+        raise danger
+    if not pathlib.Path(dir_path).exists():
+        raise danger
+    for _, _, files in os.walk(dir_path):
+        for element in files:
+            if element[:len(obj_name) - 2] == obj_name[2:]:
+                content.append(str(obj_name[:2] + element))
+    if len(content) == 0:
+        raise danger
+    return content
 
 
 def find_object(obj_name: str, gitdir: pathlib.Path) -> str:
