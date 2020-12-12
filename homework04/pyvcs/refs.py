@@ -28,7 +28,7 @@ def ref_resolve(gitdir: pathlib.Path, refname: str) -> str:
 
 
 def resolve_head(gitdir: pathlib.Path) -> tp.Optional[str]:
-    if ref_resolve(gitdir, "HEAD") is not "":
+    if ref_resolve(gitdir, "HEAD") != "":
         return ref_resolve(gitdir, "HEAD")
     return None
 
