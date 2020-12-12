@@ -32,7 +32,7 @@ class GitIndexEntry(tp.NamedTuple):
             self.mtime_s,
             self.mtime_n,
             self.dev,
-            self.ino,
+            self.ino & 0xFFFFFFFF,
             self.mode,
             self.uid,
             self.gid,
