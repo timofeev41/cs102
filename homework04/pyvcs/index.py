@@ -25,10 +25,22 @@ class GitIndexEntry(tp.NamedTuple):
     name: str
 
     def pack(self) -> bytes:
-        return struct.pack(f">10i20sh{len(self.name)}s{8 - (62 + len(self.name)) % 8}x", self.ctime_s, self.ctime_n,
-                           self.mtime_s, self.mtime_n,
-                           self.dev, self.ino, self.mode, self.uid, self.gid, self.size, self.sha1, self.flags,
-                           self.name.encode())
+        return struct.pack(
+            f">10i20sh{len(self.name)}s{8 - (62 + len(self.name)) % 8}x",
+            self.ctime_s,
+            self.ctime_n,
+            self.mtime_s,
+            self.mtime_n,
+            self.dev,
+            self.ino,
+            self.mode,
+            self.uid,
+            self.gid,
+            self.size,
+            self.sha1,
+            self.flags,
+            self.name.encode(),
+        )
 
     @staticmethod
     def unpack(data: bytes) -> "GitIndexEntry":
@@ -57,7 +69,11 @@ def read_index(gitdir: pathlib.Path) -> tp.List[GitIndexEntry]:
 
 def write_index(gitdir: pathlib.Path, entries: tp.List[GitIndexEntry]) -> None:
     entries.sort(key=lambda x: x.name)
-    content = b"DIRC" + struct.pack("!2i", 2, len(entries)) + b''.join(GitIndexEntry.pack(_) for _ in entries)
+    content = (
+        b"DIRC"
+        + struct.pack("!2i", 2, len(entries))
+        + b"".join(GitIndexEntry.pack(_) for _ in entries)
+    )
     with open(gitdir / "index", "wb") as f:
         f.write(content + hashlib.sha1(content).digest())
 
@@ -67,14 +83,28 @@ def ls_files(gitdir: pathlib.Path, details: bool = False) -> None:
     if details:
         print(*[f"{_.mode:o} {_.sha1.hex()} 0\t{_.name}" for _ in content], sep="\n")
     else:
-        print(*[_.name for _ in content], sep='\n')
+        print(*[_.name for _ in content], sep="\n")
 
 
 def update_index(gitdir: pathlib.Path, paths: tp.List[pathlib.Path], write: bool = True) -> None:
     data = read_index(gitdir)
     for i in paths:
         stats = os.stat(i)
-        data.append(GitIndexEntry(int(stats.st_ctime), 0, int(stats.st_mtime), 0, stats.st_dev,
-                               stats.st_ino, stats.st_mode, stats.st_uid, stats.st_gid, stats.st_size,
-                               bytes.fromhex(hash_object(i.open('rb').read(), 'blob', True)), len(i.name), str(i)))
+        data.append(
+            GitIndexEntry(
+                int(stats.st_ctime),
+                0,
+                int(stats.st_mtime),
+                0,
+                stats.st_dev,
+                stats.st_ino,
+                stats.st_mode,
+                stats.st_uid,
+                stats.st_gid,
+                stats.st_size,
+                bytes.fromhex(hash_object(i.open("rb").read(), "blob", True)),
+                len(i.name),
+                str(i),
+            )
+        )
     write_index(gitdir, data)
