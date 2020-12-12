@@ -24,11 +24,11 @@ def ref_resolve(gitdir: pathlib.Path, refname: str) -> str:
     if path.exists():
         with open(path, "r") as f:
             return f.read()
-    return None  # type: ignore
+    return ""
 
 
 def resolve_head(gitdir: pathlib.Path) -> tp.Optional[str]:
-    if ref_resolve(gitdir, "HEAD") is not None:
+    if ref_resolve(gitdir, "HEAD") is not "":
         return ref_resolve(gitdir, "HEAD")
     return None
 
