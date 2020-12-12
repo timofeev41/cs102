@@ -45,9 +45,9 @@ def read_object(sha: str, gitdir: pathlib.Path) -> tp.Tuple[str, bytes]:
     pos = object.find(b"\x00")
     head = object[:pos]
     head_index = head.find(b" ")
-    head = head[:head_index].decode()
+    head = head[:head_index]
     content = object[pos + 1 :]
-    return head, content
+    return head.decode(), content
 
 
 def read_tree(data: bytes) -> tp.List[tp.Tuple[int, str, str]]:
@@ -99,4 +99,4 @@ def find_tree_files(tree_sha: str, gitdir: pathlib.Path) -> tp.List[tp.Tuple[str
 def commit_parse(raw: bytes, start: int = 0, dct=None):
     data = zlib.decompress(raw)
     pos = data.find(b"tree")
-    return data[pos + 5: pos + 45]
+    return data[pos + 5 : pos + 45]
