@@ -21,18 +21,16 @@ def ref_resolve(gitdir: pathlib.Path, refname: str) -> str:
             content = f.read()
         refname = content[content.find(" ") + 1 :].strip()
     path = gitdir / refname
-    if path.exists() is False:
-        return None
-    else:
+    if path.exists():
         with open(path, "r") as f:
             return f.read()
+    return None  # type: ignore
 
 
 def resolve_head(gitdir: pathlib.Path) -> tp.Optional[str]:
     if ref_resolve(gitdir, "HEAD") is not None:
         return ref_resolve(gitdir, "HEAD")
-    else:
-        return None
+    return None
 
 
 def is_detached(gitdir: pathlib.Path) -> bool:
@@ -41,8 +39,7 @@ def is_detached(gitdir: pathlib.Path) -> bool:
         content = f.read()
     if content.startswith("ref:"):
         return False
-    else:
-        return True
+    return True
 
 
 def get_ref(gitdir: pathlib.Path) -> str:
@@ -50,6 +47,5 @@ def get_ref(gitdir: pathlib.Path) -> str:
         content = f.read()
     if is_detached(gitdir):
         return content
-    else:
-        pos = content.find(" ")
-        return content[pos + 1:].strip()
+    pos = content.find(" ")
+    return content[pos + 1 :].strip()
