@@ -12,30 +12,29 @@ from pyvcs.refs import get_ref, is_detached, resolve_head, update_ref
 def write_tree(gitdir: pathlib.Path, index: tp.List[GitIndexEntry], dirname: str = "") -> str:
     tree_content: tp.List[tp.Tuple[int, pathlib.Path, bytes]] = []
     subtrees: tp.Dict[str, tp.List[GitIndexEntry]] = dict()
-    files = []
-    for x in (gitdir.parent / dirname).glob("*"):
-        files.append(str(x))
+    files = [str(x) for x in (gitdir.parent / dirname).glob("*")]
     for entry in index:
         if entry.name in files:
-            tree_content.append((entry.mode, gitdir.parent / entry.name, entry.sha1))
+            tree_content.append((entry.mode, (gitdir.parent / entry.name), entry.sha1))
         else:
-            directory = entry.name.lstrip(dirname).split("/", 1)[0]
-            if directory not in subtrees:
-                subtrees[directory] = []
-            subtrees[directory].append(entry)
-    for tree in subtrees:
+            dname = entry.name.lstrip(dirname).split("/", 1)[0]
+            if not dname in subtrees:
+                subtrees[dname] = []
+            subtrees[dname].append(entry)
+    for name in subtrees:
+        stat = (gitdir.parent / dirname / name).stat()
         tree_content.append(
             (
                 0o40000,
-                gitdir.parent / dirname / tree,
+                gitdir.parent / dirname / name,
                 bytes.fromhex(
                     write_tree(
-                        gitdir, subtrees[tree], dirname + "/" + tree if dirname != "" else tree
+                        gitdir, subtrees[name], dirname + "/" + name if dirname != "" else name
                     )
                 ),
             )
         )
-    tree_content.sort(key=lambda _: _[1])
+    tree_content.sort(key=lambda x: x[1])
     data = b"".join(
         f"{elem[0]:o} {elem[1].name}".encode() + b"\00" + elem[2] for elem in tree_content
     )

@@ -8,15 +8,14 @@ from pyvcs.repo import repo_find
 
 
 def hash_object(data: bytes, fmt: str, write: bool = False) -> str:
-    blob = f"{fmt} {len(data)}".encode() + b"\x00" + data
-    sha = hashlib.sha1(blob).hexdigest()
+    formatted_data = (fmt + " " + str(len(data))).encode() + b"\00" + data
+    data_hash_sum = hashlib.sha1(formatted_data).hexdigest()
     if write:
-        gitdir = repo_find(".")
-        if not pathlib.Path(gitdir / "objects" / sha[:2]).exists():
-            pathlib.Path(gitdir / "objects" / f"{sha[:2]}/").mkdir(parents=True, exist_ok=True)
-            with open(gitdir / "objects" / f"{sha[:2]}/{sha[2:]}", "wb") as f:
-                f.write(zlib.compress(blob))
-    return sha
+        gitdir = repo_find()
+        (gitdir / "objects" / data_hash_sum[:2]).mkdir(exist_ok=True)
+        with (gitdir / "objects" / data_hash_sum[:2] / data_hash_sum[2:]).open("wb") as f:
+            f.write(zlib.compress(formatted_data))
+    return data_hash_sum
 
 
 def resolve_object(obj_name: str, gitdir: pathlib.Path) -> tp.List[str]:
@@ -39,15 +38,9 @@ def find_object(obj_name: str, gitdir: pathlib.Path) -> str:
 
 
 def read_object(sha: str, gitdir: pathlib.Path) -> tp.Tuple[str, bytes]:
-    path = repo_find(gitdir) / "objects" / sha[:2]
-    with open(path / sha[2:], mode="rb") as f:
-        object = zlib.decompress(f.read())
-    pos = object.find(b"\x00")
-    head = object[:pos]
-    head_index = head.find(b" ")
-    head = head[:head_index]
-    content = object[pos + 1 :]
-    return head.decode(), content
+    with open(gitdir / "objects" / sha[:2] / sha[2:], "rb") as f:
+        data = zlib.decompress(f.read())
+    return data.split(b" ")[0].decode(), data.split(b"\00", maxsplit=1)[1]
 
 
 def read_tree(data: bytes) -> tp.List[tp.Tuple[int, str, str]]:
