@@ -1,4 +1,3 @@
-import os
 import pathlib
 import stat
 import time
@@ -49,11 +48,12 @@ def commit_tree(
     author: tp.Optional[str] = None,
 ) -> str:
     now = int(time.mktime(time.localtime()))
-    timezone = time.timezone
-    if timezone > 0:
-        tz_str = "." + f"{abs(timezone) // 60 // 60:02}{abs(timezone) // 60 % 60:02}"
+    tz = time.timezone
+    if tz > 0:
+        tz_str = "-"
     else:
-        tz_str = "+" + f"{abs(timezone) // 60 // 60:02}{abs(timezone) // 60 % 60:02}"
+        tz_str = "+"
+    tz_str += f"{abs(tz) // 60 // 60:02}{abs(tz) // 60 % 60:02}"
     cont = [f"tree {tree}"]
     if parent is not None:
         cont.append(f"parent {parent}")

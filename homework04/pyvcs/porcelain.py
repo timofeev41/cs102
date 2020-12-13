@@ -1,50 +1,57 @@
 import os
 import pathlib
 import typing as tp
-import shutil
 
 from pyvcs.index import read_index, update_index
-from pyvcs.objects import commit_parse, find_object, find_tree_files, read_object
+from pyvcs.objects import commit_parse, find_object, find_tree_files, read_object, read_tree
 from pyvcs.refs import get_ref, is_detached, resolve_head, update_ref
 from pyvcs.tree import commit_tree, write_tree
 
 
 def add(gitdir: pathlib.Path, paths: tp.List[pathlib.Path]) -> None:
-    update_index(gitdir, paths, True)
+    for path in paths:
+        if path.is_dir():
+            add(gitdir, list(path.glob("*")))
+            return None
+        update_index(gitdir, [path], write=True)
 
 
 def commit(gitdir: pathlib.Path, message: str, author: tp.Optional[str] = None) -> str:
-    tree_sha = write_tree(gitdir, read_index(gitdir))
-    return commit_tree(gitdir, tree=tree_sha, message=message, author=author)
+    tree = write_tree(gitdir, read_index(gitdir), str(gitdir.parent))
+    parent_commit = resolve_head(gitdir)
+    return str(commit_tree(gitdir, tree, message, parent_commit, author))
 
 
 def checkout(gitdir: pathlib.Path, obj_name: str) -> None:
-    if is_detached(gitdir) and get_ref(gitdir) == obj_name:
-        return
-    elif get_ref(gitdir).split("/")[2] == obj_name:
-        return
-    elif resolve_head(gitdir) == obj_name:
-        return
-    elif (gitdir / "refs" / "heads" / obj_name).exists():
-        with open(gitdir / "refs" / "heads" / obj_name, "r") as f1:
-            obj_name = f1.read()
-
-    index = read_index(gitdir)
-    for entry in index:
-        if os.path.exists(entry.name):
-            if "/" in entry.name:
-                shutil.rmtree(entry.name[: entry.name.find("/")])
-            else:
-                os.remove(entry.name)
-
-    with open(gitdir / "objects" / obj_name[:2] / obj_name[2:], "rb") as f2:
-        commit_content = f2.read()
-    tree_sha = commit_parse(commit_content).decode()
-
-    for file in find_tree_files(tree_sha, gitdir):
-        if "/" in file[0]:
-            dir_name = file[0][: file[0].find("/")]
-            os.mkdir(dir_name)
-        with open(file[0], "w") as f3:
-            header, content = read_object(file[1], gitdir)
-            f3.write(content.decode())
+    for entry in read_index(gitdir):
+        if pathlib.Path(entry.name).exists():
+            os.remove(entry.name)
+    commit_data = commit_parse(read_object(obj_name, gitdir)[1])
+    finished = False
+    while not finished:
+        trees: tp.List[tp.Tuple[pathlib.Path, tp.List[tp.Tuple[int, str, str]]]] = [
+            (gitdir.parent, read_tree(read_object(commit_data["tree"], gitdir)[1]))
+        ]
+        while trees:
+            tree_path, tree_content = trees.pop()
+            for file_data in tree_content:
+                fmt, data = read_object(file_data[1], gitdir)
+                if fmt == "tree":
+                    trees.append((tree_path / file_data[2], read_tree(data)))
+                    if not (tree_path / file_data[2]).exists():
+                        (tree_path / file_data[2]).mkdir()
+                else:
+                    if not (tree_path / file_data[2]).exists():
+                        with (tree_path / file_data[2]).open("wb") as f:
+                            f.write(data)
+                        (tree_path / file_data[2]).chmod(int(str(file_data[0]), 8))
+        if "parent" in commit_data:
+            commit_data = commit_parse((read_object(commit_data["parent"], gitdir)[1]))
+        else:
+            finished = True
+    for dir in gitdir.parent.glob("*"):
+        if dir != gitdir and dir.is_dir():
+            try:
+                os.removedirs(dir)
+            except OSError:
+                continue
