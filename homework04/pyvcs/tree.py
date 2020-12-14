@@ -29,7 +29,9 @@ def write_tree(gitdir: pathlib.Path, index: tp.List[GitIndexEntry], dirname: str
                 gitdir.parent / dirname / name,
                 bytes.fromhex(
                     write_tree(
-                        gitdir, subtrees[name], dirname + "/" + name if dirname != "" else name
+                        gitdir,
+                        subtrees[name],
+                        dirname + "/" + name if dirname != "" else name,
                     )
                 ),
             )
@@ -50,8 +52,7 @@ def commit_tree(
 ) -> str:
     if author is None and "GIT_AUTHOR_NAME" in os.environ and "GIT_AUTHOR_EMAIL" in os.environ:
         author = (
-            os.getenv("GIT_AUTHOR_NAME", None) + " " + f'<{os.getenv("GIT_AUTHOR_EMAIL", None)}>'
-        )  # type:ignore
+            str(os.getenv("GIT_AUTHOR_NAME", None) + " " + f'<{os.getenv("GIT_AUTHOR_EMAIL", None)}>'))  # type:ignore
     now = int(time.mktime(time.localtime()))
     tz = time.timezone
     if tz > 0:
