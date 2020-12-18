@@ -2,9 +2,9 @@ from setuptools import setup
 
 import pyvcs
 
-AUTHOR = "Dmitrii Sorokin"
-AUTHOR_EMAIL = "dementiy@yandex.ru"
-HOME_PAGE = "https://github.com/Dementiy/pybook-assignments"
+AUTHOR = "Timofeev Nikolas"
+AUTHOR_EMAIL = "timofeevnik41@gmail.com"
+HOME_PAGE = "https://github.com/timofeev41/cs102"
 
 setup(
     name="pyvcs",
