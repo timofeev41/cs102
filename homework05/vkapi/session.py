@@ -4,11 +4,27 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
+from vkapi.config import VK_CONFIG
 
-class Session:
+
+class TimeoutHTTPAdapter(HTTPAdapter):
+    def __init__(self, timeout, *args, **kwargs):
+        self.timeout = timeout
+        if "timeout" in kwargs:
+            self.timeout = kwargs["timeout"]
+            del kwargs["timeout"]
+        super().__init__(*args, **kwargs)
+
+    def send(self, request, **kwargs):
+        timeout = kwargs.get("timeout")
+        if timeout is None:
+            kwargs["timeout"] = self.timeout
+        return super().send(request, **kwargs)
+
+
+class Session(requests.Session):
     """
     Сессия.
-
     :param base_url: Базовый адрес, на который будут выполняться запросы.
     :param timeout: Максимальное время ожидания ответа от сервера.
     :param max_retries: Максимальное число повторных запросов.
@@ -22,10 +38,30 @@ class Session:
         max_retries: int = 3,
         backoff_factor: float = 0.3,
     ) -> None:
-        pass
+        super().__init__()
+        self.base_url = base_url
 
-    def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:
-        pass
+        retry = Retry(
+            total=max_retries,
+            status_forcelist=[500, 503],
+            backoff_factor=backoff_factor,
+        )
 
-    def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:
-        pass
+        adapter = TimeoutHTTPAdapter(timeout=timeout, max_retries=retry)
+        super().mount(self.base_url, adapter)
+
+    def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
+        return self.send("GET", self.base_url + url, *args, **kwargs)
+
+    def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
+        return self.send("POST", self.base_url + url, *args, **kwargs)
+
+    def send(self, method: str, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
+        if "params" not in kwargs:
+            kwargs["params"] = dict()
+
+        kwargs["params"]["access_token"] = VK_CONFIG["access_token"]
+        kwargs["params"]["v"] = VK_CONFIG["version"]
+
+        prepared = requests.Request(method, url, *args, **kwargs).prepare()
+        return super().send(prepared)
