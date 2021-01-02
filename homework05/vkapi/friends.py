@@ -11,12 +11,22 @@ QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
 
 @dataclasses.dataclass(frozen=True)
 class FriendsResponse:
+    """
+    Ответ на вызов метода `friends.get`.
+
+    :param count: Количество пользователей.
+    :param items: Список идентификаторов друзей пользователя или список пользователей.
+    """
+
     count: int
     items: tp.Union[tp.List[int], tp.List[tp.Dict[str, tp.Any]]]
 
 
 def get_friends(
-    user_id: int, count: int = 5000, offset: int = 0, fields: tp.Optional[tp.List[str]] = None
+    user_id: int,
+    count: int = 5000,
+    offset: int = 0,
+    fields: tp.Optional[tp.List[str]] = None,
 ) -> FriendsResponse:
     """
     Получить список идентификаторов друзей пользователя или расширенную информацию
@@ -28,7 +38,15 @@ def get_friends(
     :param fields: Список полей, которые нужно получить для каждого пользователя.
     :return: Список идентификаторов друзей пользователя или список пользователей.
     """
-    pass
+    user_data = {"user_id": user_id, "count": count, "offset": offset, "fields": fields}
+    response = session.get("/friends.get", params=user_data)
+    if "error" in response.json():
+        raise APIError(response.json()["error"]["error_msg"])
+    else:
+        return FriendsResponse(
+            count=response.json()["response"]["count"],
+            items=response.json()["response"]["items"],
+        )
 
 
 class MutualFriends(tp.TypedDict):
@@ -57,4 +75,11 @@ def get_mutual(
     :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
     :param progress: Callback для отображения прогресса.
     """
-    pass
+    # user_data = {"source_uid": source_uid, "target_uid": target_uid, "target_uids": target_uids,
+    # "order": order, "count": count, "offset": offset, "progress": progress}
+    # response = session.get("/friends.getMutual", params=user_data)
+    # if "error" in response.json():
+    #     raise APIError(response.json()["error"]["error_msg"])
+    # else:
+    #     result = MutualFriends(id=)
+    #     return result
