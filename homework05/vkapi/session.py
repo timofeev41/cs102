@@ -4,8 +4,6 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-from vkapi.config import VK_CONFIG
-
 
 class TimeoutHTTPAdapter(HTTPAdapter):
     def __init__(self, timeout, *args, **kwargs):
@@ -51,17 +49,8 @@ class Session(requests.Session):
         super().mount(self.base_url, adapter)
 
     def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
-        return self.send("GET", self.base_url + url, *args, **kwargs)
+        return super().get(self.base_url + url, *args, **kwargs)
 
     def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
-        return self.send("POST", self.base_url + url, *args, **kwargs)
-
-    def send(self, method: str, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
-        if "params" not in kwargs:
-            kwargs["params"] = dict()
-
-        kwargs["params"]["access_token"] = VK_CONFIG["access_token"]
-        kwargs["params"]["v"] = VK_CONFIG["version"]
-
-        prepared = requests.Request(method, url, *args, **kwargs).prepare()
-        return super().send(prepared)
+        return super().post(self.base_url + url, *args, **kwargs)
+        
