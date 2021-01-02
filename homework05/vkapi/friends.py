@@ -38,9 +38,16 @@ def get_friends(
     :param fields: Список полей, которые нужно получить для каждого пользователя.
     :return: Список идентификаторов друзей пользователя или список пользователей.
     """
-    user_data = {"user_id": user_id, "count": count, "offset": offset, "fields": fields}
+    user_data = {
+        "access_token": config.VK_CONFIG["access_token"],
+        "v": config.VK_CONFIG["version"],
+        "count": count,
+        "user_id": user_id if user_id is not None else "",
+        "fields": ",".join(fields) if fields is not None else "",
+        "offset": offset,
+    }
     response = session.get("/friends.get", params=user_data)
-    if "error" in response.json():
+    if "error" in response.json() or not response.ok:
         raise APIError(response.json()["error"]["error_msg"])
     else:
         return FriendsResponse(
