@@ -49,8 +49,8 @@ class Session(requests.Session):
         super().mount(self.base_url, adapter)
 
     def get(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
-        return super().get(self.base_url + url, *args, **kwargs)
+        return super().get(self.base_url + "/" + url, *args, **kwargs)
 
     def post(self, url: str, *args: tp.Any, **kwargs: tp.Any) -> requests.Response:  # type: ignore
-        return super().post(self.base_url + url, *args, **kwargs)
+        return super().post(self.base_url + "/" + url, *args, **kwargs)
         

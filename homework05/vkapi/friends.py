@@ -46,7 +46,7 @@ def get_friends(
         "fields": ",".join(fields) if fields is not None else "",
         "offset": offset,
     }
-    response = session.get("/friends.get", params=user_data)
+    response = session.get("friends.get", params=user_data)
     if "error" in response.json() or not response.ok:
         raise APIError(response.json()["error"]["error_msg"])
     else:
@@ -82,11 +82,44 @@ def get_mutual(
     :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
     :param progress: Callback для отображения прогресса.
     """
-    # user_data = {"source_uid": source_uid, "target_uid": target_uid, "target_uids": target_uids,
-    # "order": order, "count": count, "offset": offset, "progress": progress}
-    # response = session.get("/friends.getMutual", params=user_data)
-    # if "error" in response.json():
-    #     raise APIError(response.json()["error"]["error_msg"])
-    # else:
-    #     result = MutualFriends(id=)
-    #     return result
+    if target_uids is None:
+        params = {
+            "access_token": config.VK_CONFIG["access_token"],
+            "v": config.VK_CONFIG["version"],
+            "source_uid": source_uid if source_uid is not None else "",
+            "target_uid": target_uid,
+            "order": order,
+        }
+        response = session.get(f"friends.getMutual", params=params)
+        response_json = response.json()
+        if "error" in response_json or not response.ok:
+            raise APIError(response_json["error"]["error_msg"])
+        return response_json["response"]
+
+    responses = []
+    if progress is None:
+        progress = lambda x: x
+    for i in progress(range(math.ceil(len(target_uids) / 100))):
+        params = {
+            "access_token": config.VK_CONFIG["access_token"],
+            "v": config.VK_CONFIG["version"],
+            "target_uids": ",".join(map(str, target_uids)),
+            "order": order,
+            "count": count if count is not None else "",
+            "offset": offset + i * 100,
+        }
+        response = session.get(f"friends.getMutual", params=params)
+        filee = response.json()
+        if "error" in filee or not response.ok:
+            raise APIError(filee["error"]["error_msg"])
+        for arg in filee["response"]:
+            responses.append(
+                MutualFriends(
+                    id=arg["id"],
+                    common_friends=arg["common_friends"],
+                    common_count=arg["common_count"],
+                )
+            )
+        if i % 3 == 2:
+            time.sleep(1)
+    return responses
