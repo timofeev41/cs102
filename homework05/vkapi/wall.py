@@ -2,6 +2,7 @@ import textwrap
 import time
 import typing as tp
 from string import Template
+import math
 
 import pandas as pd
 from pandas import json_normalize
@@ -20,7 +21,46 @@ def get_posts_2500(
     extended: int = 0,
     fields: tp.Optional[tp.List[str]] = None,
 ) -> tp.Dict[str, tp.Any]:
-    pass
+    # fmt: off
+    script = f"""
+    var i = 0; 
+    var result = [];
+    while (i < {max_count}){{
+        if ({offset}+i+100 > {count}){{
+            result.push(API.wall.get({{
+            "owner_id": "{owner_id}",
+            "domain": "{domain}",
+            "offset": "{offset} +i",
+            "count": "{count}-(i+{offset})",
+            "filter": "{filter}",
+            "extended": "{extended}",
+            "fields": "{fields}"
+        }}));
+    }} 
+    result.push(API.wall.get({{
+            "owner_id": "{owner_id}",
+            "domain": "{domain}",
+            "offset": "{offset} +i",
+            "count": "{count}",
+            "filter": "{filter}",
+            "extended": "{extended}",
+            "fields": "{fields}"
+        }}));
+        i = i + {max_count};
+    }}
+    return result;
+    """
+    # fmt: on
+    data = {
+        "code": script,
+        "access_token": config.VK_CONFIG["access_token"],
+        "v": config.VK_CONFIG["version"],
+    }
+    response = session.post("execute", data=data)
+    doc = response.json()
+    if "error" in doc or not response.ok:
+        raise APIError(doc["error"]["error_msg"])
+    return doc["response"]["items"]
 
 
 def get_wall_execute(
@@ -49,4 +89,15 @@ def get_wall_execute(
     :param fields: Список дополнительных полей для профилей и сообществ, которые необходимо вернуть.
     :param progress: Callback для отображения прогресса.
     """
-    pass
+    finish = pd.DataFrame()
+    if progress is None:
+        progress = lambda x: x
+
+    for _ in progress(range(math.ceil(count / 2500))):
+        finish = finish.append(
+            json_normalize(
+                get_posts_2500(owner_id, domain, offset, count, max_count, filter, extended, fields)
+            )
+        )
+        time.sleep(1)
+    return finish
