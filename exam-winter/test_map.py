@@ -42,3 +42,5 @@ def test_find_solution():
         ["☒", "☒", "☒"],
     ]
     assert solved == actual_solution
+
+print("OK!")
