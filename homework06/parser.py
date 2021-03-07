@@ -15,7 +15,8 @@ def extract_news(parser: BeautifulSoup) -> News:
         title = item.getText()
         href = item.get("href", None)
         points = subtext[pos].select(".score")[0].getText()
-        news_list.append({"title": title, "link": href, "points": points})
+        user = subtext[pos].select(".hnuser")[0].getText()
+        news_list.append({"title": title, "link": href, "points": points, "author": user})
     return news_list
 
 
