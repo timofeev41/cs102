@@ -3,10 +3,11 @@ from bs4 import BeautifulSoup
 
 from typing import Dict, List, Any
 
+News = List[Dict[str, str]]
 
-def extract_news(parser: BeautifulSoup) -> List[Dict[str, str]]:
+def extract_news(parser: BeautifulSoup) -> News:
     """ Extract news from a given web page """
-    news_list = []
+    news_list: News = []
     links = parser.select('.storylink')
     subtext = parser.select('.subtext')
     for pos, item in enumerate(links):
@@ -17,22 +18,22 @@ def extract_news(parser: BeautifulSoup) -> List[Dict[str, str]]:
     return news_list
 
 
-def extract_next_page(parser: BeautifulSoup):
+def extract_next_page(parser: BeautifulSoup) -> str:
     """ Extract next page URL """
-    # PUT YOUR CODE HERE
-    pass
+    link = parser.select('.morelink')[0]['href']
+    return link[link.index('?'):]
 
 
-def get_news(url: str, n_pages: int = 1):
+def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1) -> News:
     """ Collect news from a given web page """
-    news: List[Dict[str, str]] = []
+    news: News = []
     while n_pages:
         print("Collecting data from page: {}".format(url))
         response = requests.get(url)
         soup = BeautifulSoup(response.text, "html.parser")
         news_list = extract_news(soup)
         next_page = extract_next_page(soup)
-        url = "https://news.ycombinator.com/" + next_page
+        url = "https://news.ycombinator.com/newest" + next_page
         news.extend(news_list)
         n_pages -= 1
     return news
