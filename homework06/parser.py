@@ -14,8 +14,12 @@ def extract_news(parser: BeautifulSoup) -> News:
     for pos, item in enumerate(links):
         title = item.getText()
         href = item.get("href", None)
-        points = subtext[pos].select(".score")[0].getText()
+        if str(href).startswith("item"):
+            href = "https://news.ycombinator.com/" + href
+        points = int(subtext[pos].select(".score")[0].getText().split()[0])
         user = subtext[pos].select(".hnuser")[0].getText()
+        if user is None:
+            user = "None"
         news_list.append({"title": title, "link": href, "points": points, "author": user})
     return news_list
 
@@ -23,6 +27,8 @@ def extract_news(parser: BeautifulSoup) -> News:
 def extract_next_page(parser: BeautifulSoup) -> str:
     """ Extract next page URL """
     link = parser.select(".morelink")[0]["href"]
+    if link is None:
+        raise Exception("Parsed all news")
     return link[link.index("?") :]
 
 
