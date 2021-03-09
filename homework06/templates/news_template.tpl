@@ -6,14 +6,14 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.12/semantic.min.js"></script>
     </head>
-    <body style="background: rgb(199,138,41); background: linear-gradient(90deg, rgba(199,138,41,1) 27%, rgba(0,212,255,1) 81%);">
+    <body style="background: rgb(34,193,195); background: radial-gradient(circle, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%);">
         <div class="ui container" style="font-size: 20px; text-align: center; padding-top: 10px;">Hacker News</div>
         <div class="ui container" style="padding-top: 10px; opacity: 0.95;">
         <table class="ui celled table" style="text-align: center">
             <thead>
                 <th>Title</th>
                 <th>Author</th>
-                <th>#Likes</th>
+                <th>Likes</th>
                 <th colspan="3">Label</th>
             </thead>
             <tbody>
