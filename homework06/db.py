@@ -34,5 +34,6 @@ def add_news(news: List[Dict[str, str]]) -> None:
 
 Base.metadata.create_all(bind=engine)
 
-# news_list = get_news(n_pages=34)
-# add_news(news_list)
+if __name__ == "__main__":
+    news_list = get_news(n_pages=34)
+    add_news(news_list)
