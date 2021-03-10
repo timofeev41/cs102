@@ -16,7 +16,14 @@ def main_page():
 def news_list():
     s = session()
     rows = s.query(News).filter(News.label == None).all()
-    return template("templates/news_template", rows=rows)
+    return template("templates/news_template", rows=rows, more_button=True)
+
+
+@route("/news_labeled")
+def news_list_labeled():
+    s = session()
+    rows = s.query(News).filter(News.label != None).all()
+    return template("templates/news_template", rows=rows, more_button=False)
 
 
 @route("/add_label/")

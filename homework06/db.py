@@ -41,8 +41,15 @@ def update_label(id: int, label: str) -> None:
     s.commit()
 
 
+def extract_all_news_from_db():
+    s = session()
+    entries = s.query(News).all()
+    return entries
+
+
 Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
+    # При запуске db.py получаем 1000+ записей в базе данных
     news_list = get_news(n_pages=34)
     add_news(news_list)
