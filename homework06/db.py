@@ -1,8 +1,10 @@
 from typing import Dict, List, Any
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Column, Integer, String, create_engine, update
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from parser import get_news
+
+from sqlalchemy.sql import elements
 
 Base = declarative_base()
 engine = create_engine("sqlite:///news.db")
@@ -29,6 +31,13 @@ def add_news(news: List[Dict[str, str]]) -> None:
             points=content["points"],
         )
         s.add(thing)
+    s.commit()
+
+
+def update_label(id: int, label: str) -> None:
+    s = session()
+    entry = s.query(News).get(int(id))
+    entry.label = label
     s.commit()
 
 

@@ -2,9 +2,14 @@ from bottle import SimpleTemplate, route, run, template, redirect, request
 from sqlalchemy.orm import query_expression
 
 
-from db import News, session
+from db import News, session, update_label
 
 # from bayes import NaiveBayesClassifier
+
+
+@route("/")
+def main_page():
+    return template("templates/main_menu")
 
 
 @route("/news")
@@ -20,12 +25,10 @@ def add_label():
     try:
         label, id = req.split("&")
     except ValueError:
-        return template("templates/exception", exception="Expected 2 arguments")
-    print(f"{label} {id}")
-    # 1. Получить значения параметров label и id из GET-запроса
-    # 2. Получить запись из БД с соответствующим id (такая запись только одна!)
-    # 3. Изменить значение метки записи на значение label
-    # 4. Сохранить результат в БД
+        return template("templates/exception", exception="Expected 2 arguments. Label and ID.")
+    label = label[label.index("=") + 1 :]
+    id = id[id.index("=") + 1 :]
+    update_label(id=id, label=label)
     redirect("/news")
 
 
