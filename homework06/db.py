@@ -2,7 +2,7 @@ from typing import Dict, List, Any
 from sqlalchemy import Column, Integer, String, create_engine, update
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from parser import get_news
+from scrapper import get_news
 
 from sqlalchemy.sql import elements
 
@@ -21,7 +21,7 @@ class News(Base):
     label = Column(String)
 
 
-def add_news(news: List[Dict[str, str]]) -> None:
+def add_news(news: List[Dict[str, str]], current_session) -> None:
     s = session()
     for content in news:
         thing = News(
