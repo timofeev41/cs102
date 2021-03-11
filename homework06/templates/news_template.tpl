@@ -24,12 +24,26 @@
                     <td><a href="{{ row.url }}">{{ "😱" + row.title if int(row.points) >= 100 else "🔥" + row.title if int(row.points) >= 10 else row.title }}</a></td>
                     <td>{{ row.author }}</td>
                     <td>{{ row.points }}</td>
+                    %if label:
                     <td class="positive"><a href="/add_label/?label=good&id={{ row.id }}">👍</a></td>
                     <td class="active"><a href="/add_label/?label=maybe&id={{ row.id }}">🤔</a></td>
                     <td class="negative"><a href="/add_label/?label=never&id={{ row.id }}">👎</a></td>
+                    %else:
+                    <%
+                    if row.label == "good":
+                        var = "👍"
+                    elif row.label == "never":
+                        var = "👎"
+                    else:
+                        var = "🤔"
+                    end
+                    %>
+                    <td><a>{{ var }}</a></td>
+                    %end
                 </tr>
                 %end
             </tbody>
+            % if more_button:
             <tfoot class="full-width">
                 <tr>
                     <th colspan="7">
@@ -37,6 +51,7 @@
                     </th>
                 </tr>
             </tfoot>
+            % end
         </table>
         </div>
     </body>

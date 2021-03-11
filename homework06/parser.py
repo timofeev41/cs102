@@ -35,10 +35,12 @@ def extract_next_page(parser: BeautifulSoup) -> str:
 def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1) -> News:
     """ Collect news from a given web page """
     news: News = []
+    if not url.startswith("https://news.ycombinator.com"):
+        raise Exception("Script only able to scrap news from https://news.ycombinator.com")
     while n_pages:
         print("Collecting data from page: {}".format(url))
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
+
         news_list = extract_news(soup)
         next_page = extract_next_page(soup)
         url = "https://news.ycombinator.com/newest" + next_page
