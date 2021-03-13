@@ -9,6 +9,7 @@ from sqlalchemy.sql import elements
 Base = declarative_base()
 engine = create_engine("sqlite:///news.db")
 session = sessionmaker(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 
 class News(Base):
@@ -21,7 +22,7 @@ class News(Base):
     label = Column(String)
 
 
-def add_news(news: List[Dict[str, str]], current_session) -> None:
+def add_news(news: List[Dict[str, str]]) -> None:
     s = session()
     for content in news:
         thing = News(
@@ -32,6 +33,7 @@ def add_news(news: List[Dict[str, str]], current_session) -> None:
         )
         s.add(thing)
     s.commit()
+    s.close()
 
 
 def update_label(id: int, label: str) -> None:
@@ -39,11 +41,13 @@ def update_label(id: int, label: str) -> None:
     entry = s.query(News).get(int(id))
     entry.label = label
     s.commit()
+    s.close()
 
 
 def extract_all_news_from_db():
     s = session()
     entries = s.query(News).all()
+    s.close()
     return entries
 
 
@@ -58,13 +62,10 @@ def load_fresh_news() -> None:
             fresh_news.append(item)
     if fresh_news:
         add_news(news=fresh_news, current_session=session)
-    else:
-        print("Log - - Nothing to update")
+    s.close()
 
-
-Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
     # При запуске db.py получаем 1000+ записей в базе данных
-    news_list = get_news(n_pages=34)
+    news_list = get_news(n_pages=1)
     add_news(news_list)
