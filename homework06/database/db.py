@@ -2,7 +2,7 @@ from typing import Dict, List, Any
 from sqlalchemy import Column, Integer, String, create_engine, update
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from scrapper import get_news
+from utils.scrapper import get_news
 
 from sqlalchemy.sql import elements
 
@@ -45,6 +45,21 @@ def extract_all_news_from_db():
     s = session()
     entries = s.query(News).all()
     return entries
+
+
+def load_fresh_news() -> None:
+    s = session()
+    fresh_news: List[Dict[str, Any]] = []
+    news = get_news(n_pages=1)
+    for item in news:
+        ttl, auth = item["title"], item["author"]
+        find = list(s.query(News).filter(News.title == ttl, News.author == auth))
+        if not len(find):
+            fresh_news.append(item)
+    if fresh_news:
+        add_news(news=fresh_news, current_session=session)
+    else:
+        print("Log - - Nothing to update")
 
 
 Base.metadata.create_all(bind=engine)

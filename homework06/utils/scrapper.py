@@ -40,7 +40,7 @@ def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1)
     while n_pages:
         print("Collecting data from page: {}".format(url))
         response = requests.get(url)
-
+        soup = BeautifulSoup(response.text, "html.parser")
         news_list = extract_news(soup)
         next_page = extract_next_page(soup)
         url = "https://news.ycombinator.com/newest" + next_page

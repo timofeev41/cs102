@@ -1,8 +1,8 @@
-from bottle import SimpleTemplate, route, run, template, redirect, request
-from sqlalchemy.orm import query_expression
+from typing import Dict, Any, List
+from bottle import route, run, template, redirect, request
 
-
-from db import News, session, update_label
+from database.db import News, session, update_label, load_fresh_news
+from utils.scrapper import get_news
 
 # from bayes import NaiveBayesClassifier
 
@@ -39,9 +39,9 @@ def add_label():
     redirect("/news")
 
 
-@route("/update")
+@route("/update_news")
 def update_news():
-    # PUT YOUR CODE HERE
+    load_fresh_news()
     redirect("/news")
 
 
