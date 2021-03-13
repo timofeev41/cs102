@@ -1,11 +1,26 @@
-from database import db
+from sqlalchemy.sql.functions import current_date
+from sqlalchemy import Column, Integer, String, create_engine, update
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-Base = db.declarative_base()
-engine = db.create_engine("sqlite:///test.db")
-session = db.sessionmaker(bind=engine)
-Base.metadata.create_all(bind=engine)
+from database.db import *
 
 
-def test_add_news():
-    news = [{"title": "Test", "author": "Nikolay", "url": "https://example.com", "points": 10}]
-    db.add_news(news=news)
+def test_add_news() -> None:
+    pass
+
+
+def test_update_label() -> None:
+    pass
+
+
+def test_extract_all_news() -> None:
+    actual = extract_all_news_from_db()
+    s = session()
+    expected = s.query(News).all()
+    s.close()
+    assert len(expected) == len(actual)
+
+
+def test_load_fresh_news() -> None:
+    pass
