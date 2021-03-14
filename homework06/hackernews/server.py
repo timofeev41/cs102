@@ -34,7 +34,9 @@ def add_label():
     try:
         label, id = req.split("&")
     except ValueError:
-        return template("hackernews/templates/exception", exception="Expected 2 arguments. Label and ID.")
+        return template(
+            "hackernews/templates/exception", exception="Expected 2 arguments. Label and ID."
+        )
     label = label[label.index("=") + 1 :]
     id = id[id.index("=") + 1 :]
     update_label(id=id, label=label)

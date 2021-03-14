@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, String, create_engine, update
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from database.db import *
+from hackernews.database.db import *
 
 
 def test_add_news() -> None:
