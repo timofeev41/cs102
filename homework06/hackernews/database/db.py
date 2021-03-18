@@ -3,11 +3,12 @@ from typing import Dict, List, Any
 from hackernews.utils.scrapper import get_news
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 Base = declarative_base()
-engine = create_engine("sqlite:///news.db")
-session = sessionmaker(bind=engine)
+SQLALCHEMY_DATABASE_URL = "sqlite:///news.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False)
 
 
 class News(Base):
@@ -20,8 +21,12 @@ class News(Base):
     label = Column(String)
 
 
-def add_news(news: List[Dict[str, str]]) -> None:
-    s = session()
+def get_session(engine) -> Session:
+    SessionLocal.configure(bind=engine)
+    return SessionLocal()
+
+
+def add_news(session: Session, news: List[Dict[str, str]]) -> None:
     for content in news:
         thing = News(
             title=content["title"],
@@ -29,35 +34,33 @@ def add_news(news: List[Dict[str, str]]) -> None:
             url=content["link"],
             points=content["points"],
         )
-        s.add(thing)
-    s.commit()
+        session.add(thing)
+    session.commit()
 
 
-def update_label(id: int, label: str) -> None:
-    s = session()
-    entry = s.query(News).get(int(id))
+def update_label(session: Session, id: int, label: str) -> None:
+    entry = session.query(News).get(int(id))
     entry.label = label
-    s.commit()
+    session.commit()
 
-def extract_all_news_from_db():
-    s = session()
-    entries = s.query(News).all()
+
+def extract_all_news_from_db(session: Session):
+    entries = session.query(News).all()
     return entries
 
 
-def load_fresh_news() -> None:
-    s = session()
+def load_fresh_news(session: Session) -> None:
     fresh_news: List[Dict[str, Any]] = []
     news = get_news(n_pages=1)
     for item in news:
         ttl, auth = item["title"], item["author"]
-        find = list(s.query(News).filter(News.title == ttl, News.author == auth))
-        if not len(find):
+        exists = list(session.query(News).filter(News.title == ttl, News.author == auth))
+        if not exists:
             fresh_news.append(item)
         else:
             break
     if fresh_news:
-        add_news(news=fresh_news)
+        add_news(session=session, news=fresh_news)
 
 
 Base.metadata.create_all(bind=engine)

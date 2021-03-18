@@ -1,12 +1,28 @@
+import pytest
 from hackernews.database.db import *
 
 
-def test_add_news() -> None:
-    pass
+def db_set_up(engine):
+    Base.metadata.create_all(bind=engine)
 
 
-def test_update_label() -> None:
-    pass
+def db_tear_down(session):
+    session.query(News).delete()
+    session.commit()
+    session.close()
+
+
+@pytest.fixture
+def engine():
+    return create_engine("sqlite://")
+
+
+@pytest.fixture
+def session(engine):
+    session = get_session(engine)
+    db_set_up(engine)
+    yield session
+    db_tear_down(session)
 
 
 def test_extract_all_news() -> None:
