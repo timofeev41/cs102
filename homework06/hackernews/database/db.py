@@ -1,15 +1,13 @@
 from typing import Dict, List, Any
-from sqlalchemy import Column, Integer, String, create_engine, update
+
+from hackernews.utils.scrapper import get_news
+from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from hackernews.utils.scrapper import get_news
-
-from sqlalchemy.sql import elements
 
 Base = declarative_base()
 engine = create_engine("sqlite:///news.db")
 session = sessionmaker(bind=engine)
-Base.metadata.create_all(bind=engine)
 
 
 class News(Base):
@@ -33,7 +31,6 @@ def add_news(news: List[Dict[str, str]]) -> None:
         )
         s.add(thing)
     s.commit()
-    s.close()
 
 
 def update_label(id: int, label: str) -> None:
@@ -41,13 +38,10 @@ def update_label(id: int, label: str) -> None:
     entry = s.query(News).get(int(id))
     entry.label = label
     s.commit()
-    s.close()
-
 
 def extract_all_news_from_db():
     s = session()
     entries = s.query(News).all()
-    s.close()
     return entries
 
 
@@ -60,9 +54,13 @@ def load_fresh_news() -> None:
         find = list(s.query(News).filter(News.title == ttl, News.author == auth))
         if not len(find):
             fresh_news.append(item)
+        else:
+            break
     if fresh_news:
-        add_news(news=fresh_news, current_session=session)
-    s.close()
+        add_news(news=fresh_news)
+
+
+Base.metadata.create_all(bind=engine)
 
 
 if __name__ == "__main__":

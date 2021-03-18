@@ -1,8 +1,3 @@
-from sqlalchemy.sql.functions import current_date
-from sqlalchemy import Column, Integer, String, create_engine, update
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
 from hackernews.database.db import *
 
 
