@@ -68,6 +68,6 @@ Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
     # При запуске db.py получаем 1000+ записей в базе данных
-    s = get_session(SessionLocal)
+    s = get_session(engine)
     news_list = get_news(n_pages=1)
     add_news(session=s, news=news_list)
