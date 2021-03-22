@@ -1,4 +1,5 @@
 import string
+import typing as tp
 
 from hackernews.utils.types import Words
 
@@ -8,7 +9,7 @@ def clean(word: str) -> str:
     return word.translate(translator).lower()
 
 
-def prepare_data(data: Words):
+def prepare_data(data: Words) -> tp.List[str]:
     clean_data: tp.List[str] = []
     for item in data:
         clean_item = clean(item)

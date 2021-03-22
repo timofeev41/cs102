@@ -1,14 +1,14 @@
-from typing import Dict, List, Any
+import typing as tp
 
 import requests
 from bs4 import BeautifulSoup
 
-News = List[Dict[str, Any]]
+from hackernews.utils.types import NewsList
 
 
-def extract_news(parser: BeautifulSoup) -> News:
+def extract_news(parser: BeautifulSoup) -> NewsList:
     """ Extract news from a given web page """
-    news_list: News = []
+    news_list: NewsList = []
     links = parser.select(".storylink")
     subtext = parser.select(".subtext")
     for pos, item in enumerate(links):
@@ -29,12 +29,12 @@ def extract_next_page(parser: BeautifulSoup) -> str:
     link = parser.select(".morelink")[0]["href"]
     if link is None:
         raise Exception("Parsed all news")
-    return link[link.index("?") :]
+    return str(link[link.index("?") :])
 
 
-def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1) -> News:
+def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1) -> NewsList:
     """ Collect news from a given web page """
-    news: News = []
+    news: NewsList = []
     if not url.startswith("https://news.ycombinator.com"):
         raise Exception("Script only able to scrap news from https://news.ycombinator.com")
     while n_pages:
@@ -47,7 +47,3 @@ def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1)
         news.extend(news_list)
         n_pages -= 1
     return news
-
-
-def add(a, b):
-    return a+b

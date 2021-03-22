@@ -74,5 +74,5 @@ def test_fresh_news_can_be_added(session):
 
     load_fresh_news(session)
 
-    all_news = extract_all_news_from_db(session)
+    all_news = extract_all_news_from_db(session=session)
     assert len(all_news) == 32
