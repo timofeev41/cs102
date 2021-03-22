@@ -1,9 +1,9 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import requests
 from bs4 import BeautifulSoup
 
-News = List[Dict[str, str]]
+News = List[Dict[str, Any]]
 
 
 def extract_news(parser: BeautifulSoup) -> News:
@@ -47,3 +47,7 @@ def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1)
         news.extend(news_list)
         n_pages -= 1
     return news
+
+
+def add(a, b):
+    return a+b
