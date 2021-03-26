@@ -3,8 +3,12 @@ import typing as tp
 import requests
 from bs4 import BeautifulSoup
 
-from hackernews.utils.types import NewsList
+NewsList = tp.List[tp.Dict[str, tp.Union[int, str]]]
 
+
+def get_soup(url: str = "https://news.ycombinator.com/newest") -> BeautifulSoup:
+    r = requests.get(url)
+    return BeautifulSoup(r.text, "html.parser")
 
 def extract_news(parser: BeautifulSoup) -> NewsList:
     """ Extract news from a given web page """
@@ -32,18 +36,18 @@ def extract_next_page(parser: BeautifulSoup) -> str:
     return str(link[link.index("?") :])
 
 
-def get_news(url: str = "https://news.ycombinator.com/newest", n_pages: int = 1) -> NewsList:
+def get_news(parser: BeautifulSoup, n_pages: int = 1) -> NewsList:
     """ Collect news from a given web page """
     news: NewsList = []
-    if not url.startswith("https://news.ycombinator.com"):
-        raise Exception("Script only able to scrap news from https://news.ycombinator.com")
     while n_pages:
-        print("Collecting data from page: {}".format(url))
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-        news_list = extract_news(soup)
-        next_page = extract_next_page(soup)
+        print("Collecting data from page: {}".format(n_pages))
+        news_list = extract_news(parser)
+        next_page = extract_next_page(parser)
         url = "https://news.ycombinator.com/newest" + next_page
         news.extend(news_list)
         n_pages -= 1
     return news
+
+if __name__ == '__main__':
+    z = get_soup()
+    print(get_news(z)[:2])
