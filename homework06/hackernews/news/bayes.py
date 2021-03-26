@@ -61,7 +61,8 @@ class NaiveBayesClassifier:
             scores[c] += log(self._class_freq[c])
             for word in titles:
                 scores[c] += log(self._words_freq[c][word] + self.alpha) / (
-                        len(self._words_freq[c].values()) + self.alpha * self._d)
+                    len(self._words_freq[c].values()) + self.alpha * self._d
+                )
             scores[c] = round(scores[c], 2)
         min_val, prediction = max(scores.values()), str
         for c, v in scores.items():
@@ -70,14 +71,13 @@ class NaiveBayesClassifier:
                 break
         return prediction
 
-    def score(self, X_test: Words, y_test: Labels):
+    def score(self, X_test: Words, y_test: Labels) -> float:
         """ Returns the mean accuracy on the given test data and labels. """
         cnt_ok, cnt_all = 0, len(X_test)
         for x, y in zip(X_test, y_test):
             classified = self.predict(x)
             if classified == y:
                 cnt_ok += 1
-        print(f"{cnt_all} {cnt_ok}")
         return cnt_ok / float(cnt_all)
 
 

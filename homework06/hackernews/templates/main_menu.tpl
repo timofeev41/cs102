@@ -17,6 +17,7 @@
             <p></p>
             <a href="/news" class="small ui primary button">Let's go!</a>
             <a href="/news_labeled" class="small ui primary button">Check labeled news!</a>
+            <a href="/recommendations" class="small ui primary button">Personal recommendations</a>
             <div class="ui section divider"></div>
             <h2 class="ui icon header" style="text-align: center;">
                 <i class="circular fork icon"></i>
