@@ -11,7 +11,7 @@ def data():
 
 @pytest.fixture()
 def spam_data():
-    with open("tests/spam_collection.csv") as f:
+    with open("homework06/tests/spam_collection.csv") as f:
         data = list(csv.reader(f, delimiter="\t"))
     return data
 
