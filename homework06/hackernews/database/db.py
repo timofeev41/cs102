@@ -6,7 +6,6 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, Query
 
-DBEntries = tp.Iterable[Query]  # type: ignore
 NewsList = tp.List[tp.Dict[str, tp.Union[int, str]]]
 
 Base = declarative_base()
@@ -51,7 +50,7 @@ def update_label(session: Session, id: int, label: str) -> None:
         session.commit()
 
 
-def extract_all_news_from_db(session: Session) -> DBEntries:
+def extract_all_news_from_db(session: Session) -> tp.List[News]:
     entries = session.query(News).all()
     return entries
 
