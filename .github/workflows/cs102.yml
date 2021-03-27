@@ -24,7 +24,7 @@ jobs:
         pylint --exit-zero ${{ github.head_ref }}
     - name: Run mypy
       run: |
-        mypy ${{ github.head_ref }} --ignore-missing --strict
+        mypy ${{ github.head_ref }} --ignore-missing --strict --exclude "tests"
     - name: Run black
       run: |
         black --exclude "test*" ${{ github.head_ref }} -l 100
