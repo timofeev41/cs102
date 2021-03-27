@@ -1,7 +1,7 @@
 import string
 import typing as tp
 
-from hackernews.utils.types import Words
+Words = tp.Iterable[str]
 
 
 def clean(word: str) -> str:

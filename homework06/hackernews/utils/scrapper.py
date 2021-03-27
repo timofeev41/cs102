@@ -2,13 +2,18 @@ import typing as tp
 
 import requests
 from bs4 import BeautifulSoup
+from requests.exceptions import MissingSchema
 
 NewsList = tp.List[tp.Dict[str, tp.Union[int, str]]]
 
 
 def get_soup(url: str = "https://news.ycombinator.com/newest") -> BeautifulSoup:
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+    except MissingSchema:
+        r = requests.get("http://" + url)
     return BeautifulSoup(r.text, "html.parser")
+
 
 def extract_news(parser: BeautifulSoup) -> NewsList:
     """ Extract news from a given web page """
@@ -47,7 +52,3 @@ def get_news(parser: BeautifulSoup, n_pages: int = 1) -> NewsList:
         news.extend(news_list)
         n_pages -= 1
     return news
-
-if __name__ == '__main__':
-    z = get_soup()
-    print(get_news(z)[:2])
