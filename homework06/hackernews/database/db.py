@@ -1,12 +1,13 @@
 import typing as tp
 from sqlalchemy.future import Engine
 
-from hackernews.utils.scrapper import get_news
+from hackernews.utils.scrapper import get_news, get_soup
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker, Session, Query
 
-from hackernews.utils.types import DBEntries, NewsList
+DBEntries = tp.Iterable[Query]  # type: ignore
+NewsList = tp.List[tp.Dict[str, tp.Union[int, str]]]
 
 Base = declarative_base()
 SQLALCHEMY_DATABASE_URL = "sqlite:///news.db"
@@ -22,6 +23,7 @@ class News(Base):  # type: ignore
     url = Column(String)
     points = Column(Integer)
     label = Column(String)
+    prediction = Column(String)
 
 
 @tp.no_type_check
@@ -55,8 +57,9 @@ def extract_all_news_from_db(session: Session) -> DBEntries:
 
 
 def load_fresh_news(session: Session) -> None:
+    soup = get_soup()
     fresh_news: tp.List[tp.Dict[str, tp.Any]] = []
-    news = get_news(n_pages=1)
+    news = get_news(parser=soup, n_pages=1)
     for item in news:
         ttl, auth = item["title"], item["author"]
         exists = list(session.query(News).filter(News.title == ttl, News.author == auth))
