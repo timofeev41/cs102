@@ -2,7 +2,14 @@ import typing as tp
 
 from bottle import route, run, template, redirect, request
 
-from hackernews.database.db import News, get_session, engine, update_label, load_fresh_news, extract_all_news_from_db
+from hackernews.database.db import (
+    News,
+    get_session,
+    engine,
+    update_label,
+    load_fresh_news,
+    extract_all_news_from_db,
+)
 
 from hackernews.news.bayes import NaiveBayesClassifier
 
@@ -40,8 +47,8 @@ def add_label() -> None:
         label, id = req.split("&")
     except ValueError:
         return template("templates/exception", exception="Expected 2 arguments. Label and ID.")
-    label = label[label.index("=") + 1:]
-    id = id[id.index("=") + 1:]
+    label = label[label.index("=") + 1 :]
+    id = id[id.index("=") + 1 :]
     update_label(session=s, id=id, label=label)
     redirect("/news")
 
@@ -61,7 +68,6 @@ def recommendations():
 
     labeled_news = s.query(News).filter(News.label != None).all()
     unlabeled_news = s.query(News).filter(News.label == None).all()
-
     model = NaiveBayesClassifier()
 
     X: tp.List[str] = []
@@ -80,7 +86,7 @@ def recommendations():
     s.commit()
 
     news = extract_all_news_from_db(session=s)
-    return template('templates/news_template_rec', rows=news, more_button=False, label=False)
+    return template("templates/news_template_rec", rows=news, more_button=False, label=False)
 
 
 if __name__ == "__main__":
