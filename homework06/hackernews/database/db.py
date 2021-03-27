@@ -58,7 +58,7 @@ def extract_all_news_from_db(session: Session) -> DBEntries:
 
 def load_fresh_news(session: Session) -> None:
     soup = get_soup()
-    fresh_news: tp.List[tp.Dict[str, tp.Any]] = []
+    fresh_news: tp.List[tp.Dict[str, tp.Union[int, str]]] = []
     news = get_news(parser=soup, n_pages=1)
     for item in news:
         ttl, auth = item["title"], item["author"]
