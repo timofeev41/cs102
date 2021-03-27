@@ -18,7 +18,7 @@ jobs:
         pip install -r homework06/requirements.txt
     - name: Run pytest
       run: |
-        pytest ${{ github.head_ref }}
+        pytest ${{ github.head_ref }} --cov ${{ github.head_ref }}
     - name: Run pylint
       run: |
         pylint --exit-zero ${{ github.head_ref }}
