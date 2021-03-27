@@ -52,7 +52,7 @@ def update_label(session: Session, id: int, label: str) -> None:
 
 def extract_all_news_from_db(session: Session) -> tp.List[News]:
     entries = session.query(News).all()
-    return entries
+    return entries  # type: ignore
 
 
 def load_fresh_news(session: Session) -> None:
