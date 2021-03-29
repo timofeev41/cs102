@@ -8,8 +8,9 @@ from hackernews.utils.textutils import prepare_data
 class NaiveBayesClassifier:
     def __init__(self, alpha: float = 1) -> None:
         self.alpha = alpha
-        self._words_freq: tp.DefaultDict[str, tp.DefaultDict[str, tp.Union[float]]]
+        self._words_count: tp.DefaultDict[str, tp.DefaultDict[str, tp.Union[float]]]
         self._class_freq: tp.DefaultDict[str, tp.Union[float]]
+        self._class_count: tp.DefaultDict[str, int]
         self._d: int = 0
 
     @staticmethod
@@ -44,12 +45,22 @@ class NaiveBayesClassifier:
             return len(words)
         return 0
 
+    @staticmethod
+    def count_words(
+        vocab_freq: tp.DefaultDict[str, tp.DefaultDict[str, float]]
+    ) -> tp.DefaultDict[str, int]:
+        cnt: tp.DefaultDict[str, int] = defaultdict(lambda: 0)
+        for c in vocab_freq.keys():
+            cnt[c] = sum(vocab_freq[c].values())  # type:ignore
+        return cnt
+
     def fit(self, X: tp.List[str], y: tp.List[str]) -> None:
         """ Fit Naive Bayes classifier according to X, y. """
         X = prepare_data(X)
-        self._words_freq = self.make_words_list(X, y)
+        self._words_count = self.make_words_list(X, y)
         self._class_freq = self.make_classes_list(y)
-        self._d = self.count_entries(self._words_freq)
+        self._class_count = self.count_words(self._words_count)
+        self._d = self.count_entries(self._words_count)
 
     def predict(self, title: str) -> str:
         """ Perform classification on an array of test vectors title. """
@@ -57,13 +68,14 @@ class NaiveBayesClassifier:
         titles = prepare_data(title.split())
         classes = self._class_freq.keys()
         for c in classes:
-            scores[c] += log(self._class_freq[c])
+            scores[c] -= log(self._class_freq[c])
             for word in titles:
-                scores[c] += log(self._words_freq[c][word] + self.alpha) / (
-                    len(self._words_freq[c].values()) + self.alpha * self._d
+                scores[c] -= log(
+                    (self._words_count[c][word] + self.alpha)
+                    / (self._class_count[c] + self.alpha * self._d)
                 )
             scores[c] = round(scores[c], 2)
-        min_val, prediction = max(scores.values()), ""
+        min_val, prediction = min(scores.values()), ""
         for c, v in scores.items():
             if v == min_val:
                 prediction = c
