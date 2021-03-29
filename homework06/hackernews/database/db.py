@@ -56,7 +56,7 @@ def update_label(session: Session, id: int, label: str) -> None:
 
 def extract_all_news_from_db(session: Session) -> NewsList:
     entries = session.query(News).all()
-    return entries
+    return entries  # type: ignore
 
 
 def load_fresh_news(session: Session, url: str = "https://news.ycombinator.com/newest") -> None:
