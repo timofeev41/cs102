@@ -59,8 +59,8 @@ def extract_all_news_from_db(session: Session) -> NewsList:
     return entries
 
 
-def load_fresh_news(session: Session) -> None:
-    soup = get_soup()
+def load_fresh_news(session: Session, url: str = "https://news.ycombinator.com/newest") -> None:
+    soup = get_soup(url=url)
     fresh_news: RawNewsList = []
     news = get_news(parser=soup, n_pages=1)
     for item in news:
