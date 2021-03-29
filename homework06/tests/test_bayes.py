@@ -21,68 +21,61 @@ def classifier():
     return NaiveBayesClassifier()
 
 
-def test_init(classifier):
-    model = classifier
-    model.__init__(alpha=1)
-
+def test_alpha_has_default_value_equal_to_1():
+    model = NaiveBayesClassifier()
     assert model.alpha == 1
 
 
-def test_make_words_list(classifier):
-    model = classifier
-
+def test_make_words_list():
     words, labels = ["a b c"], ["pos"]
     expected_result = {"pos": {"a": 1, "b": 1, "c": 1}}
-    actual_result = model.make_words_list(words, labels)
+    actual_result = NaiveBayesClassifier.make_words_list(words, labels)
 
     assert expected_result == actual_result
 
     words, labels = [], []
     expected_result = {}
-    actual_result = model.make_words_list(words, labels)
+    actual_result = NaiveBayesClassifier.make_words_list(words, labels)
 
     assert expected_result == actual_result
 
     words, labels = ["a b c", "c c c"], ["pos", "neg"]
     expected_result = {"pos": {"a": 1, "b": 1, "c": 1}, "neg": {"c": 3}}
-    actual_result = model.make_words_list(words, labels)
+    actual_result = NaiveBayesClassifier.make_words_list(words, labels)
 
     assert expected_result == actual_result
 
 
-def test_make_classes_list(classifier):
-    model = classifier
-
+def test_make_classes_list():
     classes = ["pos", "neg", "pos", "neg"]
     expected_result = {"pos": 2 / 4, "neg": 2 / 4}
-    actual_result = model.make_classes_list(classes)
+    actual_result = NaiveBayesClassifier.make_classes_list(classes)
 
     assert expected_result == actual_result
 
     classes = []
     expected_result = {}
-    actual_result = model.make_classes_list(classes)
+    actual_result = NaiveBayesClassifier.make_classes_list(classes)
 
     assert expected_result == actual_result
 
 
-def test_count_entries(classifier):
-    model = classifier
+def test_count_entries():
     data = {"pos": {"a": 1, "b": 1, "c": 1}, "neg": {"c": 3}}
     expected_result = 3
-    actual_result = model.count_entries(data)
+    actual_result = NaiveBayesClassifier.count_entries(data)
 
     assert expected_result == actual_result
 
     data = {"pos": {}, "neg": {}}
     expected_result = 0
-    actual_result = model.count_entries(data)
+    actual_result = NaiveBayesClassifier.count_entries(data)
 
     assert expected_result == actual_result
 
     data = {}
     expected_result = 0
-    actual_result = model.count_entries(data)
+    actual_result = NaiveBayesClassifier.count_entries(data)
 
     assert expected_result == actual_result
 

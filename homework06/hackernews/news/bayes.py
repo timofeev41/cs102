@@ -75,12 +75,8 @@ class NaiveBayesClassifier:
                     / (self._class_count[c] + self.alpha * self._d)
                 )
             scores[c] = round(scores[c], 2)
-        min_val, prediction = min(scores.values()), ""
-        for c, v in scores.items():
-            if v == min_val:
-                prediction = c
-                break
-        return prediction
+        predicted_label, _ = min(scores.items(), key=lambda item: item[1])
+        return predicted_label
 
     def score(self, X_test: tp.List[str], y_test: tp.List[str]) -> float:
         """ Returns the mean accuracy on the given test data and labels. """
