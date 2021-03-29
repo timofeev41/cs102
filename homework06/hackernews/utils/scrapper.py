@@ -29,7 +29,7 @@ def extract_news(parser: BeautifulSoup) -> NewsList:
         user = subtext[pos].select(".hnuser")[0].getText()
         if user is None:
             user = "None"
-        news_list.append({"title": title, "link": href, "points": points, "author": user})
+        news_list.append({"title": title, "url": href, "points": points, "author": user})
     return news_list
 
 

@@ -6,8 +6,6 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, Query
 
-NewsList = tp.List[tp.Dict[str, tp.Union[int, str]]]
-
 Base = declarative_base()
 SQLALCHEMY_DATABASE_URL = "sqlite:///news.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -25,47 +23,53 @@ class News(Base):  # type: ignore
     prediction = Column(String)
 
 
+RawNewsList = tp.List[tp.Dict[str, tp.Union[int, str]]]
+NewsList = tp.List[News]
+
+
 @tp.no_type_check
 def get_session(engine: Engine) -> Session:
     SessionLocal.configure(bind=engine)
     return SessionLocal()
 
 
-def add_news(session: Session, news: NewsList) -> None:
-    for content in news:
-        thing = News(
-            title=content["title"],
-            author=content["author"],
-            url=content["link"],
-            points=content["points"],
-        )
-        session.add(thing)
+def add_news(session: Session, raw_news_list: RawNewsList) -> None:
+    # for content in news:
+    #     article = News(
+    #         title=content["title"],
+    #         author=content["author"],
+    #         url=content["link"],
+    #         points=content["points"],
+    #     )
+    #     session.add(article)
+    news = [News(**news_data) for news_data in raw_news_list]
+    session.add_all(news)
     session.commit()
 
 
 def update_label(session: Session, id: int, label: str) -> None:
-    entry = session.query(News).get(int(id))
+    entry = session.query(News).get(id)
     if entry is not None:
         entry.label = label
         session.commit()
 
 
-def extract_all_news_from_db(session: Session) -> tp.List[News]:
+def extract_all_news_from_db(session: Session) -> NewsList:
     entries = session.query(News).all()
-    return entries  # type: ignore
+    return entries
 
 
 def load_fresh_news(session: Session) -> None:
     soup = get_soup()
-    fresh_news: tp.List[tp.Dict[str, tp.Union[int, str]]] = []
+    fresh_news: RawNewsList = []
     news = get_news(parser=soup, n_pages=1)
     for item in news:
-        ttl, auth = item["title"], item["author"]
-        exists = list(session.query(News).filter(News.title == ttl, News.author == auth))
+        title, author = item["title"], item["author"]
+        exists = list(session.query(News).filter(News.title == title, News.author == author))
         if not exists:
             fresh_news.append(item)
     if fresh_news:
-        add_news(session=session, news=fresh_news)
+        add_news(session=session, raw_news_list=fresh_news)
 
 
 Base.metadata.create_all(bind=engine)
