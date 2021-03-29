@@ -93,7 +93,7 @@ def test_fit(data, classifier):
     model.fit(X, y)
 
     assert model._d == 3
-    assert model._words_freq == {"pos": {"first": 1, "statement": 1}, "neg": {"second": 1, "statement": 1}}
+    assert model._words_count == {"pos": {"first": 1, "statement": 1}, "neg": {"second": 1, "statement": 1}}
     assert model._class_freq == {"pos": 0.5, "neg": 0.5}
 
 
