@@ -32,9 +32,7 @@ def news_list():
 @route("/news_labeled")
 def news_list_labeled():
     s = get_session(engine=engine)
-    rows = []
-    for i in ("good", "maybe", "never"):
-        rows.extend(s.query(News).filter(News.label == i).all())
+    rows = s.query(News).filter(News.label != None).order_by(News.label)
     return template("templates/news_template", rows=rows, more_button=False, label=False)
 
 
@@ -42,13 +40,8 @@ def news_list_labeled():
 @route("/add_label/")
 def add_label() -> None:
     s = get_session(engine=engine)
-    req = request.query_string
-    try:
-        label, id = req.split("&")
-    except ValueError:
-        return template("templates/exception", exception="Expected 2 arguments. Label and ID.")
-    label = label[label.index("=") + 1 :]
-    id = id[id.index("=") + 1 :]
+    label = request.query["label"]
+    id = request.query["id"]
     update_label(session=s, id=id, label=label)
     redirect("/news")
 
