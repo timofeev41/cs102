@@ -1,0 +1,5 @@
+requests
+bs4
+sqlalchemy
+pytest
+bottle
