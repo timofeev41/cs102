@@ -2,7 +2,8 @@ import socket
 import threading
 import typing as tp
 
-from .handlers import BaseRequestHandler
+from .handlers import Address, BaseRequestHandler
+# from .handlers import BaseRequestHandler
 
 
 class TCPServer:
@@ -18,7 +19,6 @@ class TCPServer:
         self.host = host
         self.port = port
         self.server_address = (host, port)
-        # @see: https://stackoverflow.com/questions/36594400/what-is-backlog-in-tcp-connections
         self.backlog_size = backlog_size
         self.request_handler_cls = request_handler_cls
         self.max_workers = max_workers
@@ -26,13 +26,32 @@ class TCPServer:
         self._threads: tp.List[threading.Thread] = []
 
     def serve_forever(self) -> None:
-        # @see: http://veithen.io/2014/01/01/how-tcp-backlog-works-in-linux.html
-        # @see: https://en.wikipedia.org/wiki/Thundering_herd_problem
-        # @see: https://stackoverflow.com/questions/17630416/calling-accept-from-multiple-threads
-        pass
+        address = (self.host, self.port)
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+        server_socket.bind(address)
+        server_socket.listen(5)
+
+        print(f"Server working on {self.host}:{self.port}")
+
+        for thread in range(self.max_workers+1):
+            self._threads.append(threading.Thread(target=self.handle_accept, args=(server_socket, )))
+            self._threads[thread].start()
+
+        try:
+            for i in self._threads:
+                i.join()
+        except KeyboardInterrupt:
+            print("Dead")
+            server_socket.close()
+
 
     def handle_accept(self, server_socket: socket.socket) -> None:
-        pass
+        while True:
+            client_socket, client_address = server_socket.accept()
+            handler = self.request_handler_cls(client_socket, client_address, self)
+            print(f"New connection from {client_address}")
+            handler.handle()
 
 
 class HTTPServer(TCPServer):
