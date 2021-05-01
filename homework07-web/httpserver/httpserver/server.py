@@ -3,6 +3,7 @@ import threading
 import typing as tp
 
 from .handlers import Address, BaseRequestHandler
+
 # from .handlers import BaseRequestHandler
 
 
@@ -13,7 +14,7 @@ class TCPServer:
         port: int = 5000,
         backlog_size: int = 1,
         max_workers: int = 1,
-        timeout: tp.Optional[float] = None,
+        timeout: tp.Optional[float] = 3,
         request_handler_cls: tp.Type[BaseRequestHandler] = BaseRequestHandler,
     ) -> None:
         self.host = host
@@ -30,12 +31,12 @@ class TCPServer:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
         server_socket.bind(address)
-        server_socket.listen(5)
+        server_socket.listen(self.backlog_size)
 
         print(f"Server working on {self.host}:{self.port}")
 
-        for thread in range(self.max_workers+1):
-            self._threads.append(threading.Thread(target=self.handle_accept, args=(server_socket, )))
+        for thread in range(self.max_workers + 1):
+            self._threads.append(threading.Thread(target=self.handle_accept, args=(server_socket,)))
             self._threads[thread].start()
 
         try:
@@ -45,10 +46,10 @@ class TCPServer:
             print("Dead")
             server_socket.close()
 
-
     def handle_accept(self, server_socket: socket.socket) -> None:
         while True:
             client_socket, client_address = server_socket.accept()
+            client_socket.settimeout(self.timeout)
             handler = self.request_handler_cls(client_socket, client_address, self)
             print(f"New connection from {client_address}")
             handler.handle()

@@ -21,7 +21,7 @@ class HTTPResponse:
             + "\n\n"
             + "".join(
                 [
-                    f"{key}: {value}\n"
+                    f"{key.decode()}: {value.decode()}\n"
                     for key, value in zip(self.headers.keys(), self.headers.values())
                 ]
             )
