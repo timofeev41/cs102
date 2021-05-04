@@ -10,22 +10,15 @@ class HTTPResponse:
     body: bytes = b""
 
     def to_http1(self) -> bytes:
-        method = "HTTP/1.1"
         text_status = http.client.responses[self.status]
-        http1 = "" + (
-            str(method)
-            + " "
-            + str(self.status)
-            + " "
-            + text_status
-            + "\n\n"
-            + "".join(
+        http1 = (
+            f"HTTP/1.1 {self.status} {text_status}\r\n"
+            + "\r\n".join(
                 [
-                    f"{key.decode()}: {value.decode()}\n"
+                    f"{key}: {value}"
                     for key, value in zip(self.headers.keys(), self.headers.values())
                 ]
             )
-            + "\n\n"
-            + self.body.decode()
+            + f"\r\n\r\n{self.body.decode()}"
         )
         return http1.encode()
