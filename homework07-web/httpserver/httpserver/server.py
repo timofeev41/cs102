@@ -4,8 +4,6 @@ import typing as tp
 
 from .handlers import Address, BaseRequestHandler
 
-# from .handlers import BaseRequestHandler
-
 
 class TCPServer:
     def __init__(
@@ -43,7 +41,7 @@ class TCPServer:
             for i in self._threads:
                 i.join()
         except KeyboardInterrupt:
-            print("Dead")
+            print("Got SIGTERM, shutting down...")
             server_socket.close()
 
     def handle_accept(self, server_socket: socket.socket) -> None:
