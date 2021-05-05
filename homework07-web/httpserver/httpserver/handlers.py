@@ -78,6 +78,8 @@ class BaseHTTPRequestHandler(BaseRequestHandler):
         while not self._parsed:
             try:
                 data = self.socket.recv(1024)
+                if data == b"":
+                    break
                 self.parser.feed_data(data)
             except socket.timeout:
                 print(f"Ooops, connection {self.address} timeout")
@@ -93,19 +95,19 @@ class BaseHTTPRequestHandler(BaseRequestHandler):
                 print(f"Ooops, parser error {self.address} - {exc}")
                 break
         if self._parsed:
-            response = self.response_klass(
-                status=200,
+            return self.request_klass(
+                method=self.parser.get_method(),
+                url=self._url,
                 headers=self._headers,
                 body=self._body,
             )
-            return response
         return None
 
-    def handle_request(self, request: HTTPRequest, status: int = 200) -> HTTPResponse:
-        return self.response_klass(status=status, headers=request.headers, body=request.body)
+    def handle_request(self, request: HTTPRequest, status: int = 405) -> HTTPResponse:
+        return self.response_klass(status=status, headers={}, body=b"")
 
     def handle_response(self, response: HTTPResponse) -> None:
-        self.socket.send(response.to_http1())
+        self.socket.sendall(response.to_http1())
 
     def on_url(self, url: bytes) -> None:
         self._url = url

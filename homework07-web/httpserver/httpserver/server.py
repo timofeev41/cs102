@@ -2,6 +2,8 @@ import socket
 import threading
 import typing as tp
 
+import concurrent
+from concurrent.futures import ThreadPoolExecutor
 from .handlers import Address, BaseRequestHandler
 
 
@@ -33,24 +35,24 @@ class TCPServer:
 
         print(f"Server working on {self.host}:{self.port}")
 
-        for thread in range(self.max_workers + 1):
-            self._threads.append(threading.Thread(target=self.handle_accept, args=(server_socket,)))
-            self._threads[thread].start()
+        with ThreadPoolExecutor(max_workers=self.max_workers) as exec:
+            futures = []
 
-        try:
-            for i in self._threads:
-                i.join()
-        except KeyboardInterrupt:
-            print("Got SIGTERM, shutting down...")
-            server_socket.close()
+            try:
+                while True:
+                    client_socket, address = server_socket.accept()
+                    client_socket.settimeout(self.timeout)
+                    futures.append(exec.submit(self.handle_accept, client_socket))
+            except KeyboardInterrupt:
+                for future in futures:
+                    future.cancel()
+                concurrent.futures.wait(futures, timeout=self.timeout)
+                print("\nGot SIGTERM, terminated...")
+
+        server_socket.close()
 
     def handle_accept(self, server_socket: socket.socket) -> None:
-        while True:
-            client_socket, client_address = server_socket.accept()
-            client_socket.settimeout(self.timeout)
-            handler = self.request_handler_cls(client_socket, client_address, self)
-            print(f"New connection from {client_address}")
-            handler.handle()
+        self.request_handler_cls(server_socket, self.server_address, self).handle()
 
 
 class HTTPServer(TCPServer):
