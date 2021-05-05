@@ -18,11 +18,11 @@ jobs:
         pip install -r homework06/requirements.txt
     - name: Run pylint
       run: |
-        pylint --exit-zero ${{ github.head_ref }}
+        pylint --exit-zero homework07-web
     - name: Run mypy
       run: |
         mypy --version
-        mypy ${{ github.head_ref }} --ignore-missing --exclude "tests"
+        mypy homework07-web --ignore-missing --exclude "tests"
     - name: Run black
       run: |
-        black --exclude "test*" ${{ github.head_ref }} -l 100
+        black --exclude "test*" homework07-web -l 100
