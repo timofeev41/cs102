@@ -57,7 +57,7 @@ class BaseHTTPRequestHandler(BaseRequestHandler):
         self.parser = HttpRequestParser(self)
 
         self._url: bytes = b""
-        self._headers: tp.DefaultDict[bytes, bytes] = defaultdict(lambda: bytes)
+        self._headers: tp.DefaultDict[bytes, bytes] = defaultdict()
         self._body: bytes = b""
         self._parsed = False
 
