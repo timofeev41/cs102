@@ -22,7 +22,7 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
     request_klass = WSGIRequest
     response_klass = WSGIResponse
 
-    def handle_request(self, request: WSGIRequest) -> WSGIResponse:
+    def handle_request(self, request: WSGIRequest, **kwargs) -> WSGIResponse:
         # сформировать словарь с переменными окружения
         # дополнить словарь информацией о сервере
         # вызвать приложение передав ему словарь с переменными окружения и callback'ом
