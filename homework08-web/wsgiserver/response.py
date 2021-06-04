@@ -2,6 +2,7 @@ import dataclasses
 import typing as tp
 
 from httpserver import HTTPResponse
+import datetime as dt
 
 
 @dataclasses.dataclass
@@ -11,6 +12,4 @@ class WSGIResponse(HTTPResponse):
     def start_response(
         self, status: str, response_headers: tp.List[tp.Tuple[str, str]], exc_info=None
     ) -> None:
-        # Сохранить статус и заголовки ответа
-        self.status = int(status.split()[0])
-        self.headers = {key: value for key, value in response_headers}
+        self.headers_set = [status, response_headers + [('Date', str(dt.datetime.now()))]]
