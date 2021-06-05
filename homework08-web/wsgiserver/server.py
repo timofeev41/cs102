@@ -1,6 +1,6 @@
 import typing as tp
 
-from httpserver import BaseHTTPRequestHandler, HTTPServer
+from httpserver import BaseHTTPRequestHandler, HTTPServer, BaseRequestHandler
 
 from .request import WSGIRequest
 from .response import WSGIResponse
@@ -23,10 +23,12 @@ class WSGIRequestHandler(BaseHTTPRequestHandler):
     response_klass = WSGIResponse
 
     def handle_request(self, request: WSGIRequest, **kwargs) -> WSGIResponse:
+        environ = request.to_environ()
+        environ["SERVER_NAME"], environ["SERVER_PORT"] = self.address
+
         # сформировать словарь с переменными окружения
         # дополнить словарь информацией о сервере
         # вызвать приложение передав ему словарь с переменными окружения и callback'ом
         # ответ приложения представить в виде байтовой строки
         # вернуть объект класса WSGIResponse
         pass
-
