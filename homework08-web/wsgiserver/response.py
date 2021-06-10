@@ -12,4 +12,5 @@ class WSGIResponse(HTTPResponse):
     def start_response(
         self, status: str, response_headers: tp.List[tp.Tuple[str, str]], exc_info=None
     ) -> None:
-        self.headers_set = [status, response_headers + [('Date', str(dt.datetime.now()))]]
+        self.headers = {key: value for (key, value) in response_headers}
+        self.status = int(status.split(" ")[0])
