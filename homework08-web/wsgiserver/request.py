@@ -1,7 +1,7 @@
 import dataclasses
-import typing as tp
 import io
 import sys
+import typing as tp
 
 from httpserver import HTTPRequest
 
