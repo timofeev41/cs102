@@ -17,12 +17,13 @@ logging.basicConfig(
 class WSGIServer(HTTPServer):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.app: tp.Optional[ApplicationType] = None
+        self.app_type: tp.Any = None
+        self.app: tp.Optional[tp.Any] = None
 
-    def set_app(self, app: ApplicationType) -> None:
+    def set_app(self, app: tp.Any) -> None:
         self.app = app
 
-    def get_app(self) -> tp.Optional[ApplicationType]:
+    def get_app(self) -> tp.Optional[tp.Any]:
         return self.app
 
 
