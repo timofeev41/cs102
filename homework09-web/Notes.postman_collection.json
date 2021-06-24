@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "Loign",
+			"name": "Login",
 			"event": [
 				{
 					"listen": "test",
