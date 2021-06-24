@@ -1,9 +1,18 @@
 from __future__ import annotations
+from collections import defaultdict
 
 import socket
 import typing as tp
 
 from httptools import HttpRequestParser
+from httptools.parser.errors import (
+    HttpParserError,
+    HttpParserCallbackError,
+    HttpParserInvalidStatusError,
+    HttpParserInvalidMethodError,
+    HttpParserInvalidURLError,
+    HttpParserUpgrade,
+)
 
 from .request import HTTPRequest
 from .response import HTTPResponse
@@ -48,7 +57,7 @@ class BaseHTTPRequestHandler(BaseRequestHandler):
         self.parser = HttpRequestParser(self)
 
         self._url: bytes = b""
-        self._headers: tp.Dict[bytes, bytes] = {}
+        self._headers: tp.DefaultDict[bytes, bytes] = defaultdict()
         self._body: bytes = b""
         self._parsed = False
 
@@ -57,8 +66,8 @@ class BaseHTTPRequestHandler(BaseRequestHandler):
         if request:
             try:
                 response = self.handle_request(request)
-            except Exception:
-                # TODO: log exception
+            except Exception as exc:
+                print(f"got exception - {exc}, returned 500")
                 response = self.response_klass(status=500, headers={}, body=b"")
         else:
             response = self.response_klass(status=400, headers={}, body=b"")
@@ -66,22 +75,48 @@ class BaseHTTPRequestHandler(BaseRequestHandler):
         self.close()
 
     def parse_request(self) -> tp.Optional[HTTPRequest]:
-        pass
+        while not self._parsed:
+            try:
+                data = self.socket.recv(1024)
+                if data == b"":
+                    break
+                self.parser.feed_data(data)
+            except socket.timeout:
+                print(f"Ooops, connection {self.address} timeout")
+                break
+            except (
+                HttpParserError,
+                HttpParserCallbackError,
+                HttpParserInvalidStatusError,
+                HttpParserInvalidMethodError,
+                HttpParserInvalidURLError,
+                HttpParserUpgrade,
+            ) as exc:
+                print(f"Ooops, parser error {self.address} - {exc}")
+                break
+        if self._parsed:
+            return self.request_klass(
+                method=self.parser.get_method(),
+                url=self._url,
+                headers=self._headers,
+                body=self._body,
+            )
+        return None
 
-    def handle_request(self, request: HTTPRequest) -> HTTPResponse:
-        pass
+    def handle_request(self, request: HTTPRequest, status: int = 405) -> HTTPResponse:
+        return self.response_klass(status=status, headers={}, body=b"")
 
     def handle_response(self, response: HTTPResponse) -> None:
-        pass
+        self.socket.sendall(response.to_http1())
 
     def on_url(self, url: bytes) -> None:
-        pass
+        self._url = url
 
     def on_header(self, name: bytes, value: bytes) -> None:
-        pass
+        self._headers[name] = value
 
     def on_body(self, body: bytes) -> None:
-        pass
+        self._body = body
 
     def on_message_complete(self) -> None:
-        pass
+        self._parsed = True

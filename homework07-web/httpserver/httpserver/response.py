@@ -1,5 +1,5 @@
 import dataclasses
-import http
+import http.client
 import typing as tp
 
 
@@ -10,4 +10,15 @@ class HTTPResponse:
     body: bytes = b""
 
     def to_http1(self) -> bytes:
-        pass
+        text_status = http.client.responses[self.status]
+        http1 = (
+            f"HTTP/1.1 {self.status} {text_status}\r\n"
+            + "\r\n".join(
+                [
+                    f"{key}: {value}"
+                    for key, value in zip(self.headers.keys(), self.headers.values())
+                ]
+            )
+            + f"\r\n\r\n{self.body.decode()}"
+        )
+        return http1.encode()
