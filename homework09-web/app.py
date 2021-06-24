@@ -24,6 +24,8 @@ def dt_json_serializer(o):
 def login(request: Request) -> JsonResponse:
     global users
     user_data = request.json()
+    if user_data is None:
+        return JsonResponse(data={"error": "got empty user_data"})
     users.append(user_data["email"])
     payload = {
         "email": user_data["email"],
@@ -36,6 +38,8 @@ def login(request: Request) -> JsonResponse:
 @app.post("/api/notes")
 def add_note(request: Request) -> JsonResponse:
     note = request.json()
+    if note is None:
+        return JsonResponse(data={"error": "got empty note"})
     note_id = len(notes) + 1
     note["id"] = note_id
     note["pub_date"] = dt.datetime.now()
@@ -59,10 +63,12 @@ def get_note(request: Request, id: int) -> JsonResponse:
 def update_note(request: Request, id: int) -> JsonResponse:
     note_id = int(id)
     data = request.json()
+    if data is None:
+        return JsonResponse(data={"error": "got empty request"})
     note = notes[note_id]
     note["title"] = data["title"]
     note["body"] = data["body"]
-    return JsonResponse(data={})
+    return JsonResponse(data={"status": "ok"})
 
 
 app.add_middleware(CORSMiddleware)

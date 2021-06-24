@@ -33,7 +33,7 @@ class Route:
             for i in range(len(req_path_spl)):
                 if path_spl[i].startswith("{") and path_spl[i].endswith("}"):
                     args.append(req_path_spl[i])
-            return args
+        return args
 
     def handle_route(self, request):
         args = self.parse_args(request)
@@ -51,9 +51,7 @@ class Router:
                 return route.handle_route(request)
         status = http.HTTPStatus(404)
         response_body = "\n".join([str(status.value), status.phrase, status.description])
-        return Response(
-            status.value, {}, response_body
-        )
+        return Response(status.value, {}, response_body)
 
     def add_route(self, route: Route):
         self.routes.append(route)

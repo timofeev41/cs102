@@ -38,7 +38,7 @@ class SlowAPI:
 
         answer = self.router.resolve(request)
         status = http.HTTPStatus(answer.status)
-        start_response(" ".join([str(status.value), status.phrase]), answer.headers)
+        start_response(" ".join([str(status.value), status.phrase]))
 
         return [answer.body.encode() if answer.body is not None else b""]
 
