@@ -12,23 +12,27 @@ class SlowAPI:
     def __init__(self):
         self.router = Router()
         self.middlewares: tp.List[Middleware] = []
+        self._headers: tp.DefaultDict[str, tp.Any] = defaultdict(lambda: str)
+        self._query: tp.DefaultDict[str, tp.Any] = defaultdict(lambda: str)
 
-    def __call__(self, environ: tp.Dict[str, tp.Any], start_response: tp.Callable[[tp.Any], None]):
-        headers: tp.DefaultDict[str, tp.Any] = defaultdict(lambda: str)
-        query: tp.DefaultDict[str, tp.Any] = defaultdict(lambda: str)
-
+    def _fill_headers(self, environ: tp.Dict[str, tp.Any]):
         for variable in environ:
             if variable.startswith("HTTP_"):
-                headers[variable[5:].lower()] = environ[variable]
+                self._headers[variable[5:].lower()] = environ[variable]
 
+    def _fill_query(self, environ: tp.Dict[str, tp.Any]):
         for key, value in parse_qsl(environ["QUERY_STRING"] or ""):
-            query[key] = value
+            self._query[key] = value
+
+    def __call__(self, environ: tp.Dict[str, tp.Any], start_response: tp.Callable[[tp.Any], None]):
+        self._fill_headers(environ)
+        self._fill_query(environ)
 
         request = Request(
             path=environ["PATH_INFO"].rstrip("/") or "/",
             method=environ["REQUEST_METHOD"],
-            query=query,
-            headers=headers,
+            query=self._query,
+            headers=self._headers,
             body=environ["wsgi.input"],
         )
 

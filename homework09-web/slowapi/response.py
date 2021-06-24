@@ -1,5 +1,4 @@
 import dataclasses
-import json
 import typing as tp
 
 
@@ -17,4 +16,3 @@ class JsonResponse(Response):
     data: tp.Dict[str, tp.Any] = dataclasses.field(default_factory=dict)
     status: int = 200
     serializer: tp.Optional[tp.Callable] = None
-

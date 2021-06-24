@@ -17,4 +17,3 @@ class Request:
 
     def json(self) -> tp.Optional[tp.Dict[str, tp.Any]]:
         return json.load(self.body)
-
