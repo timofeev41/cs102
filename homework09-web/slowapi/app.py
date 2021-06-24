@@ -21,7 +21,7 @@ class SlowAPI:
                 self._headers[variable[5:].lower()] = environ[variable]
 
     def _fill_query(self, environ: tp.Dict[str, tp.Any]):
-        for key, value in parse_qsl(environ["QUERY_STRING"] or ""):
+        for key, value in parse_qsl(environ.get("QUERY_STRING", "")):
             self._query[key] = value
 
     def __call__(self, environ: tp.Dict[str, tp.Any], start_response: tp.Callable[[tp.Any], None]):
@@ -29,11 +29,11 @@ class SlowAPI:
         self._fill_query(environ)
 
         request = Request(
-            path=environ["PATH_INFO"].rstrip("/") or "/",
-            method=environ["REQUEST_METHOD"],
+            path=environ.get("PATH_INFO", "").rstrip("/") or "/",
+            method=environ.get("REQUEST_METHOD", ""),
             query=self._query,
             headers=self._headers,
-            body=environ["wsgi.input"],
+            body=environ.get("wsgi.input", ""),
         )
 
         answer = self.router.resolve(request)
