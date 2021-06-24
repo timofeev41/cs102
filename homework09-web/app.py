@@ -1,5 +1,4 @@
 import datetime as dt
-import json
 import typing as tp
 
 import jwt
@@ -9,6 +8,7 @@ from slowapi.middlewares import CORSMiddleware
 
 app = SlowAPI()
 notes: tp.Dict[int, tp.Dict[str, tp.Any]] = {}
+users: tp.List[str] = []
 
 JWT_SECRET = "secret"
 JWT_ALGORITHM = "HS256"
@@ -22,8 +22,9 @@ def dt_json_serializer(o):
 
 @app.post("/api/jwt-auth/")
 def login(request: Request) -> JsonResponse:
+    global users
     user_data = request.json()
-    users.add(user_data["email"])
+    users.append(user_data["email"])
     payload = {
         "email": user_data["email"],
         "exp": dt.datetime.utcnow() + dt.timedelta(seconds=JWT_EXP_DELTA_SECONDS),
@@ -68,10 +69,6 @@ app.add_middleware(CORSMiddleware)
 
 
 def main():
-    # TODO: Добавить автоматическое приведение типов аргументов
-    # TODO: Добавить авторизацию пользователей
-    # TODO: Добавить обработку завершающего слеша
-
     from wsgiserver import WSGIRequestHandler, WSGIServer
 
     server = WSGIServer(port=8080, request_handler_cls=WSGIRequestHandler)
