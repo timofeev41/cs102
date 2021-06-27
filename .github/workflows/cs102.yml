@@ -22,7 +22,7 @@ jobs:
     - name: Run mypy
       run: |
         mypy --version
-        mypy homework07-web --ignore-missing --exclude "tests"
+        mypy homework10-web --ignore-missing --exclude "tests"
     - name: Run black
       run: |
-        black --exclude "test*" homework07-web -l 100
+        black --exclude "test*" homework10-web -l 100

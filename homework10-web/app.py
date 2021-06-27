@@ -15,7 +15,7 @@ from db import (
     update_note,
     share_note,
 )
-from security import User, UserInDB, get_current_active_user, get_current_user, oauth2_scheme
+from security import User, UserInDB, get_current_user, oauth2_scheme
 
 app = FastAPI()
 db_session = get_session(engine)
@@ -91,11 +91,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         return {"error": "incorrect pass or login"}
 
     return {"access_token": user.username, "token_type": "bearer"}
-
-
-@app.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
 
 
 @app.post("/users/add")

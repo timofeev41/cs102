@@ -92,7 +92,12 @@ def extract_note(
 ) -> tp.Optional[tp.Dict[int, tp.Dict[str, tp.Union[str, int]]]]:
     note = session.query(Note).filter_by(id=id, author=username).one()
     if note is not None:
-        return {"text": note.text, "author": note.author, "created": note.time_created, "shared_with": note.shared_with}
+        return {
+            "text": note.text,
+            "author": note.author,
+            "created": note.time_created,
+            "shared_with": note.shared_with,
+        }
     return None
 
 
@@ -108,7 +113,7 @@ def extract_all_notes(
             "text": entry.text,
             "author": entry.author,
             "created": entry.time_created,
-            "shared_with": entry.shared_with
+            "shared_with": entry.shared_with,
         }
     return json_entries  # type: ignore
 
