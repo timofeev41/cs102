@@ -19,10 +19,6 @@ jobs:
     - name: Run pylint
       run: |
         pylint --exit-zero homework07-web
-    - name: Run mypy
-      run: |
-        mypy --version
-        mypy homework10-web --ignore-missing --exclude "tests"
     - name: Run black
       run: |
         black --exclude "test*" homework10-web -l 100
