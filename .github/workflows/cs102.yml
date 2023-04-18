@@ -15,14 +15,13 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install black mypy pylint pytest-cov
-        pip install -r homework06/requirements.txt
     - name: Run pylint
       run: |
-        pylint --exit-zero homework07-web
+        pylint --exit-zero homework08-web
     - name: Run mypy
       run: |
         mypy --version
-        mypy homework07-web --ignore-missing --exclude "tests"
+        mypy homework08-web --ignore-missing --exclude "tests"
     - name: Run black
       run: |
-        black --exclude "test*" homework07-web -l 100
+        black --exclude "test*" homework08-web -l 100
